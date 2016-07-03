@@ -142,14 +142,27 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="APU.cpp" />
+    <ClCompile Include="Bus.cpp" />
+    <ClCompile Include="JoyPad.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="CPU6502.cpp" />
     <ClCompile Include="Memory.cpp" />
+    <ClCompile Include="PPU.cpp" />
+    <ClCompile Include="RomFile.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="APU.h" />
+    <ClInclude Include="Bus.h" />
     <ClInclude Include="CPU6502.h" />
     <ClInclude Include="IMemory.h" />
+    <ClInclude Include="JoyPad.h" />
     <ClInclude Include="Memory.h" />
+    <ClInclude Include="PPU.h" />
+    <ClInclude Include="RomFile.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="CpuTests.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

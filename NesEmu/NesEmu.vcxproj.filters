@@ -24,6 +24,21 @@
     <ClCompile Include="Memory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="RomFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Bus.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PPU.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="JoyPad.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="APU.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CPU6502.h">
@@ -35,5 +50,25 @@
     <ClInclude Include="IMemory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="RomFile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Bus.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PPU.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="JoyPad.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="APU.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="CpuTests.txt">
+      <Filter>Source Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>

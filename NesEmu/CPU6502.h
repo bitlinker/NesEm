@@ -9,27 +9,30 @@
 // The only other reserved locations in the memory map are the very last 6 bytes of memory $FFFA to $FFFF which must be programmed with the addresses of the non-maskable interrupt handler ($FFFA/B), 
 // the power on reset location ($FFFC/D) and the BRK/interrupt request handler ($FFFE/F) respectively.
 
-// Addressation mode
-enum AddressMode
-{
-	ADDR_D,		// Direct (Immediate)
-	ADDR_ZP,	// Zero page
-	ADDR_ZPX,	// Zero page, X
-	ADDR_ZPY,	// Zero page, Y
-	ADDR_A,		// Absolute
-	ADDR_AX,	// Absolute, X
-	ADDR_AY,	// Absolute, Y
-	ADDR_IX,	// Inderect, X
-	ADDR_IY		// Inderect, Y
-};
+//The NTSC NES runs at 1.7897725MHz, and 1.773447MHz for PAL
 
-// Memory direction mode
-enum MemMode
-{
-	MEM_NONE,	// Ignore memory
-	MEM_READ,	// Read from memory
-	MEM_WRITE	// Write to memory
-};
+// Addressation mode
+//enum AddressMode
+//{
+//	ADDR_D,			// Direct (Immediate)
+//	ADDR_ZP,		// Zero page
+//	ADDR_ZPX,		// Zero page, X
+//	ADDR_ZPY,		// Zero page, Y
+//	ADDR_A,			// Absolute
+//	ADDR_AX,		// Absolute, X
+//	ADDR_AY,		// Absolute, Y
+//	ADDR_IX,		// Inderect, X
+//	ADDR_IY,		// Inderect, Y
+//	ADDR_ACCUM,		// Accumulator
+//};
+//
+//// Memory direction mode
+//enum MemMode
+//{
+//	MEM_NONE,	// Ignore memory
+//	MEM_READ,	// Read from memory
+//	MEM_WRITE	// Write to memory
+//};
 
 class CPU6502
 {
@@ -48,6 +51,7 @@ private:
 			uint8_t interrupt_disable : 1;
 			uint8_t decimal_mode : 1;
 			uint8_t brk : 1;
+			uint8_t unused : 1;
 			uint8_t overflow : 1;
 			uint8_t negative : 1;
 		};
@@ -56,7 +60,9 @@ private:
 	TFlags flags;
 
 	IMemory* memory;
-	uint8_t src, dst;
+
+	// Current address for instruction
+	uint16_t address;
 	  
 public:
 	CPU6502(IMemory* memory);
@@ -64,10 +70,46 @@ public:
 
 	bool exec();
 
+
+public:
+	void addressImplied();
+	void addressImmediate();
+	void addressRelative();
+	void addressZP();
+	void addressZPX();
+	void addressZPY();
+	void addressAbs();
+	void addressAbsX();
+	void addressAbsY();
+	void addressIX();
+	void addressIY();
+	void addressI();
+
 private:
-	void readMem(AddressMode mode);
-	void writeMem(AddressMode mode);
-	uint8_t readPC();
+	void addressZPWOffs(uint8_t offset);
+	void addressAbsWOfs(uint8_t offset);
+	void addressIWOffs(uint8_t offset);
+
+	uint8_t read8();
+	uint16_t read16();
+	uint16_t read16_bug();
+
+	void updateZeroNegativeFlags(uint8_t value);
+	void cmpWVal(uint8_t value);
+
+	void branchRelative();
+
+	uint8_t asl(uint8_t value);
+	uint8_t lsr(uint8_t value);
+	uint8_t rol(uint8_t value);
+	uint8_t ror(uint8_t value);
+
+	void interrupt(uint16_t address);
+
+	void stackPush8(uint8_t value);
+	void stackPush16(uint16_t value);
+	uint8_t stackPop8();
+	uint16_t stackPop16();
 
 public:
 	// Load / Store Operations
@@ -114,10 +156,14 @@ public:
 	void dey();
 
 	// Shifts
-	void asl();
-	void lsr();
-	void rol();
-	void ror();
+	void asl_a();
+	void asl_m();
+	void lsr_a();
+	void lsr_m();
+	void rol_a();
+	void rol_m();
+	void ror_a();
+	void ror_m();
 
 	// Jumps & Calls
 	void jmp();

@@ -2,3 +2,6 @@ Debug/
 Release/
 .vs/
 *.db
+fceux-2.2.2/
+Docs/
+*.opendb

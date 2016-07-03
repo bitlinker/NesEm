@@ -4,11 +4,14 @@
 
 #include "CPU6502.h"
 #include "Memory.h"
+#include "RomFile.h"
 
 int main()
 {
 	Memory mem;
 	CPU6502 cpu(&mem);
+
+	RomFile cart;
 
 	FILE* f = ::fopen("rom.data", "rb");
 	::fseek(f, 0L, SEEK_END);

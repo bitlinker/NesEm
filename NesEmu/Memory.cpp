@@ -1,7 +1,9 @@
 #include "Memory.h"
 
+static const uint16_t RAM_SIZE = 0x2000;
+
 Memory::Memory()
-	: mRAM(0xFFFF) // TODO: check, const
+	: mRAM(RAM_SIZE) // TODO: check, const
 {
 }
 
