@@ -11,29 +11,6 @@
 
 //The NTSC NES runs at 1.7897725MHz, and 1.773447MHz for PAL
 
-// Addressation mode
-//enum AddressMode
-//{
-//	ADDR_D,			// Direct (Immediate)
-//	ADDR_ZP,		// Zero page
-//	ADDR_ZPX,		// Zero page, X
-//	ADDR_ZPY,		// Zero page, Y
-//	ADDR_A,			// Absolute
-//	ADDR_AX,		// Absolute, X
-//	ADDR_AY,		// Absolute, Y
-//	ADDR_IX,		// Inderect, X
-//	ADDR_IY,		// Inderect, Y
-//	ADDR_ACCUM,		// Accumulator
-//};
-//
-//// Memory direction mode
-//enum MemMode
-//{
-//	MEM_NONE,	// Ignore memory
-//	MEM_READ,	// Read from memory
-//	MEM_WRITE	// Write to memory
-//};
-
 class CPU6502
 {
 private:
@@ -92,7 +69,7 @@ private:
 
 	uint8_t read8();
 	uint16_t read16();
-	uint16_t read16_bug();
+	uint16_t read16_bug(uint16_t address);
 
 	void updateZeroNegativeFlags(uint8_t value);
 	void cmpWVal(uint8_t value);

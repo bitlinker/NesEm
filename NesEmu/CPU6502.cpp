@@ -363,12 +363,13 @@ uint16_t CPU6502::read16()
 	return MakeAddress(first, second);
 }
 
-uint16_t CPU6502::read16_bug()
+uint16_t CPU6502::read16_bug(uint16_t address)
 {
-	// TODO: do
-	uint8_t first = read8();
-	uint8_t second = read8();
-	return MakeAddress(first, second);
+	uint16_t first = address;
+	uint16_t second = (address & 0xFF) | (static_cast<uint16_t>(static_cast<uint8_t>(first) + 1));
+	uint8_t first_val = memory->read(first);
+	uint8_t second_val = memory->read(second);
+	return MakeAddress(first_val, second_val);
 }
 
 bool CPU6502::exec()
@@ -461,13 +462,11 @@ void CPU6502::addressAbsWOfs(uint8_t offset)
 
 void CPU6502::addressIX()
 {
-	// TODO: check if have bug
 	addressIWOffs(x);
 }
 
 void CPU6502::addressIY()
 {
-	// TODO: check if have bug
 	addressIWOffs(y);
 }
 
@@ -478,11 +477,14 @@ void CPU6502::addressI()
 
 void CPU6502::addressIWOffs(uint8_t offset)
 {
-	uint16_t addr = read16();
+	// TODO
+	uint16_t addr = read16_bug();
 	// TODO: bug simulator
 	uint8_t val_first = memory->read(addr);
 	uint8_t val_second = memory->read(addr + 1) + offset; // TODO: check
 	address = MakeAddress(val_first, val_second);
+
+	// TODO: page crossed flag
 }
 
 void CPU6502::updateZeroNegativeFlags(uint8_t value)
