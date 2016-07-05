@@ -333,6 +333,8 @@ CPU6502::CPU6502(IMemory* mem)
 {
 	// TODO: init static?
 	InitInstructionTable();
+
+    powerOn();
 }
 
 CPU6502::~CPU6502()
@@ -349,6 +351,22 @@ inline static bool IsSamePage(uint16_t address1, uint16_t address2)
 {
 	// TODO: check
 	return (address1 & 0xFF) == (address2 & 0xFF);
+}
+
+void CPU6502::powerOn()
+{
+    // TODO: check
+    a = 0;
+    x = 0;
+    y = 0;
+    pc = 0x24;
+    stack = 0xFD;
+    cycles = 0;
+}
+
+void CPU6502::reset()
+{
+    stack -= 3;
 }
 
 uint8_t CPU6502::read8()
@@ -399,6 +417,11 @@ bool CPU6502::exec()
 	
 	// TODO: check?
 	return !flags.brk;
+}
+
+void CPU6502::setPC(uint16_t address)
+{
+    pc = address;
 }
 
 // Memory addressation modes:
@@ -478,7 +501,7 @@ void CPU6502::addressI()
 void CPU6502::addressIWOffs(uint8_t offset)
 {
 	// TODO
-	uint16_t addr = read16_bug();
+	uint16_t addr = read16_bug(0);
 	// TODO: bug simulator
 	uint8_t val_first = memory->read(addr);
 	uint8_t val_second = memory->read(addr + 1) + offset; // TODO: check

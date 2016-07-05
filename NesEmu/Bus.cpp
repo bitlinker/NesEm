@@ -1,31 +1,74 @@
+#include <cassert>
 #include "Bus.h"
 
-static const uint16_t CONTROLLER_1_REGISTER_ADDR = 0x4016;
-static const uint16_t CONTROLLER_2_REGISTER_ADDR = 0x4017;
+// TODO
+//static const uint16_t CONTROLLER_1_REGISTER_ADDR = 0x4016;
+//static const uint16_t CONTROLLER_2_REGISTER_ADDR = 0x4017;
 
-Bus::Bus()
+Bus::Bus(RAM* ram, JoyPad* joypad1, JoyPad* joypad2, CPU6502* cpu)
+    : mRam(ram)
+    , mCPU(cpu)
 {
+    mJoyPad[0] = joypad1;
+    mJoyPad[1] = joypad2;
+    // TODO: init all
 }
 
 Bus::~Bus()
 {
 }
 
+IMemory* Bus::mapAddress(uint16_t address, bool bRead, uint16_t& mirroredAddress)
+{
+    IMemory* pModule = nullptr; // TODO: make devices itself decide memory operations?
+    mirroredAddress = address;
+
+    if (address < 0x2000)
+    {
+        mirroredAddress = address % 0x800;
+        pModule = mRam;
+    }
+    else if (address < 0x4000)
+    {
+        mirroredAddress = address % 0x8;
+        pModule = mPPU;
+    }
+    else if (address <= 0x4015 && address != 0x4014)
+    {
+        pModule = mAPU;
+    }
+    else if (address == 0x4014)
+    {
+        // TODO: OAMDMA
+    }
+    else if (address < 0x4018)
+    {
+        if (address == 0x4016)
+            pModule = mJoyPad[0];
+        else if ((address == 0x4017) && bRead)
+            pModule = mJoyPad[1];
+        else
+            pModule = mAPU;
+    }
+    else
+    {
+        pModule = mCartridge;
+    }
+    return pModule;
+}
+
 uint8_t Bus::read(uint16_t address)
 {
-	// TODO: decode address
-	if (address == CONTROLLER_1_REGISTER_ADDR || address == CONTROLLER_2_REGISTER_ADDR)
-	{
-		// TODO: assert joypads
-		return mJoyPad[address - CONTROLLER_1_REGISTER_ADDR]->read();
-	}
+    uint16_t mirroredAddress;
+    IMemory* pModule = mapAddress(address, true, mirroredAddress);
+    assert(pModule);    
+    return pModule->read(mirroredAddress);
 }
 
 void Bus::write(uint16_t address, uint8_t value)
 {
-	if (address == CONTROLLER_1_REGISTER_ADDR || address == CONTROLLER_2_REGISTER_ADDR)
-	{
-		// TODO: assert joypads
-		mJoyPad[address - CONTROLLER_1_REGISTER_ADDR]->write(value);
-	}
+    uint16_t mirroredAddress;
+    IMemory* pModule = mapAddress(address, false, mirroredAddress);
+    assert(pModule);
+    pModule->write(mirroredAddress, value);
 }

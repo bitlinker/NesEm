@@ -10,13 +10,17 @@ JoyPad::JoyPad()
 	}
 }
 
-void JoyPad::write(uint8_t value)
+JoyPad::~JoyPad()
+{
+}
+
+void JoyPad::write(uint16_t address, uint8_t value)
 {
 	mStrobe = value;
 	updateStrobeIndex();
 }
 
-uint8_t JoyPad::read()
+uint8_t JoyPad::read(uint16_t address)
 {
 	uint8_t value = 0x0;
 	if (mIndex < BTN_MAX && mButton[mIndex])

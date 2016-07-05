@@ -1,7 +1,8 @@
 #pragma once
 #include <stdint.h>
+#include "IMemory.h"
 
-class JoyPad
+class JoyPad : public IMemory
 {
 public:
 	enum Buttons
@@ -19,11 +20,12 @@ public:
 
 public:
 	JoyPad();
+    virtual ~JoyPad();
 
 	void setButton(Buttons button, bool value);
 
-	void write(uint8_t value);
-	uint8_t read();
+    virtual void write(uint16_t address, uint8_t value);
+    virtual uint8_t read(uint16_t address);
 
 private:
 	bool mButton[BTN_MAX];

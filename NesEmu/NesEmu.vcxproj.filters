@@ -4,6 +4,9 @@
     <Filter Include="Sources">
       <UniqueIdentifier>{73abd88f-dfdc-408c-ad94-99f47d3e6b57}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\Mappers">
+      <UniqueIdentifier>{92b92d55-4081-430c-88d0-2824d673e571}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="APU.cpp">
@@ -18,16 +21,17 @@
     <ClCompile Include="JoyPad.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="Memory.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
     <ClCompile Include="PPU.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
-    <ClCompile Include="RomFile.cpp">
+    <ClCompile Include="cputest.cpp" />
+    <ClCompile Include="RAM.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="NROM.cpp">
+      <Filter>Sources\Mappers</Filter>
+    </ClCompile>
+    <ClCompile Include="Cartridge.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>
@@ -44,16 +48,19 @@
     <ClInclude Include="JoyPad.h">
       <Filter>Sources</Filter>
     </ClInclude>
-    <ClInclude Include="Memory.h">
-      <Filter>Sources</Filter>
-    </ClInclude>
     <ClInclude Include="PPU.h">
       <Filter>Sources</Filter>
     </ClInclude>
-    <ClInclude Include="RomFile.h">
+    <ClInclude Include="IMemory.h">
       <Filter>Sources</Filter>
     </ClInclude>
-    <ClInclude Include="IMemory.h">
+    <ClInclude Include="RAM.h">
+      <Filter>Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="NROM.h">
+      <Filter>Sources\Mappers</Filter>
+    </ClInclude>
+    <ClInclude Include="Cartridge.h">
       <Filter>Sources</Filter>
     </ClInclude>
   </ItemGroup>

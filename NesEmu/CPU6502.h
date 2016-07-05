@@ -45,7 +45,12 @@ public:
 	CPU6502(IMemory* memory);
 	~CPU6502();
 
+    void powerOn();
+    void reset();
+
 	bool exec();
+
+    void setPC(uint16_t address);
 
 
 public:

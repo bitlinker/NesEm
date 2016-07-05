@@ -144,12 +144,13 @@
   <ItemGroup>
     <ClCompile Include="APU.cpp" />
     <ClCompile Include="Bus.cpp" />
+    <ClCompile Include="cputest.cpp" />
     <ClCompile Include="JoyPad.cpp" />
-    <ClCompile Include="main.cpp" />
     <ClCompile Include="CPU6502.cpp" />
-    <ClCompile Include="Memory.cpp" />
+    <ClCompile Include="NROM.cpp" />
+    <ClCompile Include="RAM.cpp" />
     <ClCompile Include="PPU.cpp" />
-    <ClCompile Include="RomFile.cpp" />
+    <ClCompile Include="Cartridge.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="APU.h" />
@@ -157,9 +158,10 @@
     <ClInclude Include="CPU6502.h" />
     <ClInclude Include="IMemory.h" />
     <ClInclude Include="JoyPad.h" />
-    <ClInclude Include="Memory.h" />
+    <ClInclude Include="NROM.h" />
+    <ClInclude Include="RAM.h" />
     <ClInclude Include="PPU.h" />
-    <ClInclude Include="RomFile.h" />
+    <ClInclude Include="Cartridge.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
