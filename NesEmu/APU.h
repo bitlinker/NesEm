@@ -1,5 +1,6 @@
 #pragma once
 #include <stdint.h>
+#include "IMemory.h"
 
 class PulseChannel
 {
@@ -54,14 +55,14 @@ class NoiseChannel
 
 };
 
-class APU
+class APU : public IMemory
 {
 public:
 	APU();
-	~APU();
+	virtual ~APU();
 
-    void write(uint16_t address, uint8_t value);
-    uint8_t read(uint16_t address);
+    virtual void write(uint16_t address, uint8_t value);
+    virtual uint8_t read(uint16_t address);
 
 private:
     PulseChannel mPulse1;

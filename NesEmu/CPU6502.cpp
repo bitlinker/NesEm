@@ -14,6 +14,7 @@ class Instruction
 {
 public:
 	static const uint32_t FLAG_CYCLE_PAGE_CROSSED = 1;
+    static const uint32_t FLAG_UNDOCUMENTED = 2;
 
 public:
 	Instruction()
@@ -312,6 +313,161 @@ static void InitInstructionTable()
 
 	// TYA
 	INSTRUCTIONS[0x98] = MAKE_INSTR(addressImplied, tya, 2, 0);
+
+    // Undocumented instructions:
+    // AAC (ANC)
+    INSTRUCTIONS[0x0B] = MAKE_INSTR(addressImmediate, aac, 2, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x2B] = MAKE_INSTR(addressImmediate, aac, 2, Instruction::FLAG_UNDOCUMENTED);
+
+    // SAX
+    INSTRUCTIONS[0x87] = MAKE_INSTR(addressZP, sax, 3, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x97] = MAKE_INSTR(addressZPY, sax, 4, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x83] = MAKE_INSTR(addressIX, sax, 6, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x8F] = MAKE_INSTR(addressAbs, sax, 4, Instruction::FLAG_UNDOCUMENTED);
+
+    // ARR
+    INSTRUCTIONS[0x6B] = MAKE_INSTR(addressImmediate, arr, 2, Instruction::FLAG_UNDOCUMENTED);
+
+    // ASR (ALR)
+    INSTRUCTIONS[0x4B] = MAKE_INSTR(addressImmediate, asr, 2, Instruction::FLAG_UNDOCUMENTED);
+
+    // ATX
+    INSTRUCTIONS[0xAB] = MAKE_INSTR(addressImmediate, atx, 2, Instruction::FLAG_UNDOCUMENTED);
+
+    // AXA
+    INSTRUCTIONS[0x9F] = MAKE_INSTR(addressAbsY, axa, 5, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x93] = MAKE_INSTR(addressIY, axa, 6, Instruction::FLAG_UNDOCUMENTED);
+
+    // AXS
+    INSTRUCTIONS[0xCB] = MAKE_INSTR(addressImmediate, axs, 2, Instruction::FLAG_UNDOCUMENTED);
+
+    // DCP
+    INSTRUCTIONS[0xC7] = MAKE_INSTR(addressZP, dcp, 5, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0xD7] = MAKE_INSTR(addressZPX, dcp, 6, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0xCF] = MAKE_INSTR(addressAbs, dcp, 6, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0xDF] = MAKE_INSTR(addressAbsX, dcp, 7, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0xDB] = MAKE_INSTR(addressAbsY, dcp, 7, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0xC3] = MAKE_INSTR(addressIX, dcp, 8, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0xD3] = MAKE_INSTR(addressIY, dcp, 8, Instruction::FLAG_UNDOCUMENTED);
+
+    // DOP
+    INSTRUCTIONS[0x04] = MAKE_INSTR(addressZP, nop, 3, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x14] = MAKE_INSTR(addressZPX, nop, 4, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x34] = MAKE_INSTR(addressZPX, nop, 4, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x44] = MAKE_INSTR(addressZP, nop, 3, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x54] = MAKE_INSTR(addressZPX, nop, 4, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x64] = MAKE_INSTR(addressZP, nop, 3, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x74] = MAKE_INSTR(addressZPX, nop, 4, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x80] = MAKE_INSTR(addressImmediate, nop, 2, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x82] = MAKE_INSTR(addressImmediate, nop, 2, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x89] = MAKE_INSTR(addressImmediate, nop, 2, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0xC2] = MAKE_INSTR(addressImmediate, nop, 2, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0xD4] = MAKE_INSTR(addressZPX, nop, 4, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0xE2] = MAKE_INSTR(addressImmediate, nop, 2, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0xF4] = MAKE_INSTR(addressZPX, nop, 4, Instruction::FLAG_UNDOCUMENTED);
+
+    // ISC
+    INSTRUCTIONS[0xE7] = MAKE_INSTR(addressZP, isc, 5, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0xF7] = MAKE_INSTR(addressZPX, isc, 6, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0xEF] = MAKE_INSTR(addressAbs, isc, 6, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0xFF] = MAKE_INSTR(addressAbsX, isc, 7, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0xFB] = MAKE_INSTR(addressAbsY, isc, 7, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0xE3] = MAKE_INSTR(addressIX, isc, 8, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0xF3] = MAKE_INSTR(addressIY, isc, 8, Instruction::FLAG_UNDOCUMENTED);
+
+    // KIL
+    INSTRUCTIONS[0x02] = MAKE_INSTR(addressImplied, kil, 0, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x12] = MAKE_INSTR(addressImplied, kil, 0, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x22] = MAKE_INSTR(addressImplied, kil, 0, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x32] = MAKE_INSTR(addressImplied, kil, 0, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x42] = MAKE_INSTR(addressImplied, kil, 0, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x52] = MAKE_INSTR(addressImplied, kil, 0, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x62] = MAKE_INSTR(addressImplied, kil, 0, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x72] = MAKE_INSTR(addressImplied, kil, 0, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x92] = MAKE_INSTR(addressImplied, kil, 0, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0xB2] = MAKE_INSTR(addressImplied, kil, 0, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0xD2] = MAKE_INSTR(addressImplied, kil, 0, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0xF2] = MAKE_INSTR(addressImplied, kil, 0, Instruction::FLAG_UNDOCUMENTED);
+
+    // LAR
+    INSTRUCTIONS[0xBB] = MAKE_INSTR(addressAbsY, lar, 4, Instruction::FLAG_UNDOCUMENTED | Instruction::FLAG_CYCLE_PAGE_CROSSED);
+
+    // LAX
+    INSTRUCTIONS[0xA7] = MAKE_INSTR(addressZP, lax, 3, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0xB7] = MAKE_INSTR(addressZPY, lax, 4, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0xAF] = MAKE_INSTR(addressAbs, lax, 4, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0xBF] = MAKE_INSTR(addressAbsY, lax, 4, Instruction::FLAG_UNDOCUMENTED | Instruction::FLAG_CYCLE_PAGE_CROSSED);
+    INSTRUCTIONS[0xA3] = MAKE_INSTR(addressIX, lax, 6, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0xB3] = MAKE_INSTR(addressIY, lax, 5, Instruction::FLAG_UNDOCUMENTED | Instruction::FLAG_CYCLE_PAGE_CROSSED);
+
+    // NOP
+    INSTRUCTIONS[0x1A] = MAKE_INSTR(addressImplied, nop, 2, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x3A] = MAKE_INSTR(addressImplied, nop, 2, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x5A] = MAKE_INSTR(addressImplied, nop, 2, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x7A] = MAKE_INSTR(addressImplied, nop, 2, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0xDA] = MAKE_INSTR(addressImplied, nop, 2, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0xFA] = MAKE_INSTR(addressImplied, nop, 2, Instruction::FLAG_UNDOCUMENTED);
+
+    // RLA
+    INSTRUCTIONS[0x27] = MAKE_INSTR(addressZP, rla, 5, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x37] = MAKE_INSTR(addressZPX, rla, 6, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x2F] = MAKE_INSTR(addressAbs, rla, 6, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x3F] = MAKE_INSTR(addressAbsX, rla, 7, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x3B] = MAKE_INSTR(addressAbsY, rla, 7, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x23] = MAKE_INSTR(addressIX, rla, 8, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x33] = MAKE_INSTR(addressIY, rla, 8, Instruction::FLAG_UNDOCUMENTED);
+
+    // RRA
+    INSTRUCTIONS[0x67] = MAKE_INSTR(addressZP, rra, 5, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x77] = MAKE_INSTR(addressZPX, rra, 6, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x6F] = MAKE_INSTR(addressAbs, rra, 6, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x7F] = MAKE_INSTR(addressAbsX, rra, 7, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x7B] = MAKE_INSTR(addressAbsY, rra, 7, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x63] = MAKE_INSTR(addressIX, rra, 8, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x73] = MAKE_INSTR(addressIY, rra, 8, Instruction::FLAG_UNDOCUMENTED);
+
+    // SBC
+    INSTRUCTIONS[0xEB] = MAKE_INSTR(addressImmediate, sbc, 2, Instruction::FLAG_UNDOCUMENTED);
+
+    // SLO
+    INSTRUCTIONS[0x07] = MAKE_INSTR(addressZP, slo, 5, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x17] = MAKE_INSTR(addressZPX, slo, 6, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x0F] = MAKE_INSTR(addressAbs, slo, 6, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x1F] = MAKE_INSTR(addressAbsX, slo, 7, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x1B] = MAKE_INSTR(addressAbsY, slo, 7, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x03] = MAKE_INSTR(addressIX, slo, 8, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x13] = MAKE_INSTR(addressIY, slo, 8, Instruction::FLAG_UNDOCUMENTED);
+
+    // SRE
+    INSTRUCTIONS[0x47] = MAKE_INSTR(addressZP, sre, 5, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x57] = MAKE_INSTR(addressZPX, sre, 6, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x4F] = MAKE_INSTR(addressAbs, sre, 6, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x5F] = MAKE_INSTR(addressAbsX, sre, 7, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x5B] = MAKE_INSTR(addressAbsY, sre, 7, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x43] = MAKE_INSTR(addressIX, sre, 8, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x53] = MAKE_INSTR(addressIY, sre, 8, Instruction::FLAG_UNDOCUMENTED);
+
+    // SXA
+    INSTRUCTIONS[0x9E] = MAKE_INSTR(addressAbsY, sxa, 5, Instruction::FLAG_UNDOCUMENTED);
+
+    // SYA
+    INSTRUCTIONS[0x9C] = MAKE_INSTR(addressAbsX, sya, 5, Instruction::FLAG_UNDOCUMENTED);
+
+    // TOP
+    // TODO: simple nop?
+    INSTRUCTIONS[0x0C] = MAKE_INSTR(addressAbs, nop, 4, Instruction::FLAG_UNDOCUMENTED);
+    INSTRUCTIONS[0x1C] = MAKE_INSTR(addressAbsX, nop, 4, Instruction::FLAG_UNDOCUMENTED | Instruction::FLAG_CYCLE_PAGE_CROSSED);
+    INSTRUCTIONS[0x3C] = MAKE_INSTR(addressAbsX, nop, 4, Instruction::FLAG_UNDOCUMENTED | Instruction::FLAG_CYCLE_PAGE_CROSSED);
+    INSTRUCTIONS[0x5C] = MAKE_INSTR(addressAbsX, nop, 4, Instruction::FLAG_UNDOCUMENTED | Instruction::FLAG_CYCLE_PAGE_CROSSED);
+    INSTRUCTIONS[0x7C] = MAKE_INSTR(addressAbsX, nop, 4, Instruction::FLAG_UNDOCUMENTED | Instruction::FLAG_CYCLE_PAGE_CROSSED);
+    INSTRUCTIONS[0xDC] = MAKE_INSTR(addressAbsX, nop, 4, Instruction::FLAG_UNDOCUMENTED | Instruction::FLAG_CYCLE_PAGE_CROSSED);
+    INSTRUCTIONS[0xFC] = MAKE_INSTR(addressAbsX, nop, 4, Instruction::FLAG_UNDOCUMENTED | Instruction::FLAG_CYCLE_PAGE_CROSSED);
+
+    // XAA
+    INSTRUCTIONS[0x8B] = MAKE_INSTR(addressImmediate, xaa, 2, Instruction::FLAG_UNDOCUMENTED);
+
+    // XAS
+    INSTRUCTIONS[0x9B] = MAKE_INSTR(addressAbsY, xas, 5, Instruction::FLAG_UNDOCUMENTED);
 }
 
 static const uint16_t PC_BASE_ADDRESS = 0x0600;
@@ -882,7 +1038,7 @@ void CPU6502::branchRelative()
 	// TODO: location check?
 	cycles += 1;
 	if (IsPageCrossed(oldPc, pc))
-		cycles += 2;
+		cycles += 1;
 }
 
 // Branches
@@ -1014,4 +1170,142 @@ void CPU6502::rti()
 {
     flags.values = FlagsFromStack(stackPop8());
 	pc = stackPop16();
+}
+
+// Undocumented instructions:
+void CPU6502::aac()
+{
+    // TODO: not tested
+    //uint8_t value = memory->read(address) & a;
+    //updateZeroNegativeFlags(value);
+    //flags.carry = flags.negative;
+}
+
+void CPU6502::sax()
+{  
+    uint8_t value = a & x;
+    memory->write(address, value);
+}
+
+void CPU6502::arr()
+{
+    // TODO: not tested
+    // TODO: eliminate dup read
+    //and();
+    //ror_a();
+    //// TODO: except sets the flags differently. N and Z are normal, but C is bit 6 and V is bit 6 xor bit 5.
+}
+
+void CPU6502::asr()
+{
+    // TODO: not tested
+    // TODO: eliminate dup read
+    /*and();
+    lsr_a();*/
+}
+
+void CPU6502::atx()
+{
+    // TODO: not tested
+    /*a &= memory->read(address);
+    x = a;
+    updateZeroNegativeFlags(a);*/
+}
+
+void CPU6502::axa()
+{
+    // TODO: not tested
+    /*uint8_t value = (a & x) & 7;
+    memory->write(address, value);*/
+}
+
+void CPU6502::axs()
+{
+    // TODO: not tested
+    //x &= a;
+    //x -= memory->read(address);
+    //updateZeroNegativeFlags(x);
+}
+
+void CPU6502::dcp()
+{
+    // TODO: eliminate dup read
+    dec();
+    cmp();
+}
+
+void CPU6502::isc()
+{
+    // TODO: eliminate dup read
+    inc();
+    sbc();
+}
+
+void CPU6502::kil()
+{
+    // TODO: not tested
+    // TODO: lock up
+}
+
+void CPU6502::lar()
+{
+    // TODO: not tested
+    //uint8_t value = memory->read(address) & stack;
+    //x = a = stack = value;
+    //updateZeroNegativeFlags(value);
+}
+
+void CPU6502::lax()
+{
+    uint8_t value = memory->read(address);
+    x = a = value;
+    updateZeroNegativeFlags(value);
+}
+
+void CPU6502::rla()
+{
+    // TODO: eliminate dup read
+    rol_m();
+    and();
+}
+
+void CPU6502::rra()
+{
+    // TODO: eliminate dup read
+    ror_m();
+    adc();
+}
+
+void CPU6502::slo()
+{
+    // TODO: eliminate dup read
+    asl_m();
+    ora();
+}
+
+void CPU6502::sre()
+{
+    // TODO: eliminate dup read
+    lsr_m();
+    eor();
+}
+
+void CPU6502::sxa()
+{
+    // TODO: not tested
+}
+
+void CPU6502::sya()
+{
+    // TODO: not tested
+}
+
+void CPU6502::xaa()
+{
+    // TODO: not tested
+}
+
+void CPU6502::xas()
+{
+    // TODO: not tested
 }

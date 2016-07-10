@@ -1,7 +1,8 @@
 #pragma once
 #include <stdint.h>
+#include "IMemory.h"
 
-class PPU
+class PPU : public IMemory
 {
 public:
 	union Control1
@@ -48,9 +49,9 @@ public:
 	
 public:
 	PPU();
-	~PPU();
+	virtual ~PPU();
 
-	uint8_t read(uint16_t address);
-	void write(uint16_t address, uint8_t value);
+    virtual void write(uint16_t address, uint8_t value);
+    virtual uint8_t read(uint16_t address);
 };
 

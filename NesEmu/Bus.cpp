@@ -5,9 +5,11 @@
 //static const uint16_t CONTROLLER_1_REGISTER_ADDR = 0x4016;
 //static const uint16_t CONTROLLER_2_REGISTER_ADDR = 0x4017;
 
-Bus::Bus(IMemory* ram, IMemory* mapper, IMemory* joypad1, IMemory* joypad2)
+Bus::Bus(IMemory* ram, IMemory* mapper, IMemory* joypad1, IMemory* joypad2, IMemory* apu, IMemory* ppu)
     : mRam(ram)
     , mMapper(mapper)
+    , mAPU(apu)
+    , mPPU(ppu)
 {
     mJoyPad[0] = joypad1;
     mJoyPad[1] = joypad2;

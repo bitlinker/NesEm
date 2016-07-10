@@ -11,6 +11,9 @@
 #include "Cartridge.h"
 #include "NROM.h"
 #include "RAM.h"
+#include "APU.h"
+#include "PPU.h"
+#include "JoyPad.h"
 #include "Bus.h"
 
 
@@ -92,8 +95,13 @@ int main()
 
     NROM nrom(&testRom);
     RAM ram(0x800);
+    APU apu;
+    PPU ppu;
+    JoyPad jp1;
+    JoyPad jp2;
 
-    Bus bus(&ram, &nrom, nullptr, nullptr);
+
+    Bus bus(&ram, &nrom, &jp1, &jp2, &apu, &ppu);
 
     uint8_t data = bus.read(0x8000);
 

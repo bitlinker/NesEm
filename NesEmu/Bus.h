@@ -5,7 +5,7 @@
 class Bus : public IMemory
 {
 public:
-	Bus(IMemory* ram, IMemory* mapper, IMemory* joypad1, IMemory* joypad2);
+	Bus(IMemory* ram, IMemory* mapper, IMemory* joypad1, IMemory* joypad2, IMemory* apu, IMemory* ppu);
 	virtual ~Bus();
 
 	virtual uint8_t read(uint16_t address);

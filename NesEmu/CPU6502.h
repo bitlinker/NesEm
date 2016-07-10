@@ -43,7 +43,7 @@ private:
 
 
     // Current internal data:	
-	uint16_t address;                          // Current address for instruction
+	uint16_t address;                    // Current address for instruction
     bool mIsPageCrossed;
     Instruction* mInstruction;           // Instruction
     uint32_t mCmdCnt;
@@ -190,16 +190,26 @@ public:
 	void nop();
 	void rti();
 
-    // Invalid instructions:
-    void invNop(); // TODO???
-    void lax();
+    // Undocumented instructions:
+    void aac();
     void sax();
-    void invSbc();
+    void arr();
+    void asr();
+    void atx();
+    void axa();
+    void axs();
     void dcp();
-    void isb();
-    void slo();
+    void isc();
+    void kil();
+    void lar();
+    void lax();
     void rla();
-    void sre();
     void rra();
+    void slo();
+    void sre();
+    void sxa();
+    void sya();
+    void xaa();
+    void xas();
 };
 
