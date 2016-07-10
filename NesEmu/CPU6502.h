@@ -11,6 +11,9 @@
 
 //The NTSC NES runs at 1.7897725MHz, and 1.773447MHz for PAL
 
+
+class Instruction;
+
 class CPU6502
 {
 private:
@@ -38,8 +41,12 @@ private:
 
 	IMemory* memory;
 
-	// Current address for instruction
-	uint16_t address;
+
+    // Current internal data:	
+	uint16_t address;                          // Current address for instruction
+    bool mIsPageCrossed;
+    Instruction* mInstruction;           // Instruction
+    uint32_t mCmdCnt;
 	  
 public:
 	CPU6502(IMemory* memory);
@@ -52,6 +59,13 @@ public:
 
     void setPC(uint16_t address);
 
+    uint8_t getA() { return a; }
+    uint8_t getX() { return x; }
+    uint8_t getY() { return y; }
+    uint8_t getSP() { return stack; }
+    uint16_t getPC() { return pc; }
+    uint8_t getFlags() { return flags.values; }
+    uint32_t getCycles() { return cycles; }
 
 public:
 	void addressImplied();
@@ -69,11 +83,11 @@ public:
 
 private:
 	void addressZPWOffs(uint8_t offset);
-	void addressAbsWOfs(uint8_t offset);
-	void addressIWOffs(uint8_t offset);
+    bool addressAbsWOfs(uint8_t offset);
+    bool addressIWOffs(uint8_t x, uint8_t y);
 
-	uint8_t read8();
-	uint16_t read16();
+	uint8_t read8(uint16_t address);
+	uint16_t read16(uint16_t address);
 	uint16_t read16_bug(uint16_t address);
 
 	void updateZeroNegativeFlags(uint8_t value);
@@ -175,5 +189,17 @@ public:
 	void brk();
 	void nop();
 	void rti();
+
+    // Invalid instructions:
+    void invNop(); // TODO???
+    void lax();
+    void sax();
+    void invSbc();
+    void dcp();
+    void isb();
+    void slo();
+    void rla();
+    void sre();
+    void rra();
 };
 

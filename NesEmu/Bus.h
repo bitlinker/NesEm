@@ -2,14 +2,10 @@
 #include <stdint.h>
 #include "IMemory.h"
 
-#include "CPU6502.h"
-#include "RAM.h"
-#include "JoyPad.h"
-
 class Bus : public IMemory
 {
 public:
-	Bus(RAM* ram, JoyPad* joypad1, JoyPad* joypad2, CPU6502* cpu);
+	Bus(IMemory* ram, IMemory* mapper, IMemory* joypad1, IMemory* joypad2);
 	virtual ~Bus();
 
 	virtual uint8_t read(uint16_t address);
@@ -19,11 +15,10 @@ private:
     IMemory* mapAddress(uint16_t address, bool bRead, uint16_t& mirroredAddress);
 
 private:
-    RAM* mRam;
-    CPU6502* mCPU;
+    IMemory* mRam;
     IMemory* mPPU;
     IMemory* mAPU;
-    IMemory* mCartridge;
-	JoyPad* mJoyPad[2];
+    IMemory* mMapper;
+	IMemory* mJoyPad[2];    
 };
 

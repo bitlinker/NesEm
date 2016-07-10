@@ -4,6 +4,11 @@
 
 typedef void (CPU6502::*pCpuFunc)();
 
+enum AddressMode
+{
+
+};
+
 static const uint32_t MAX_INSTR_NAME = 8;
 class Instruction
 {
@@ -17,11 +22,12 @@ public:
 		, mName("empty")
 		, mCycles(0)
 		, mFlags(0)
+        , mBytes(0)
 	{
 	}
 
 	Instruction(pCpuFunc addressFunc, pCpuFunc cpuFunc, const char* name, uint32_t cycles, uint32_t flags)
-		: mAddressFunc(nullptr)
+		: mAddressFunc(addressFunc)
 		, mCycles(cycles)
 		, mFunc(cpuFunc)
 		, mFlags(flags)
@@ -34,6 +40,7 @@ public:
 	char mName[MAX_INSTR_NAME];
 	uint32_t mCycles;
 	uint32_t mFlags;
+    uint32_t mBytes;
 };
 #define MAKE_INSTR(addressFunc, func, cycles, flags) Instruction(&CPU6502::##addressFunc, &CPU6502::##func, #func, cycles, flags)
 
@@ -43,7 +50,6 @@ static Instruction INSTRUCTIONS[MAX_INSTRUCTIONS];
 
 static void InitInstructionTable()
 {
-	// TODO: sort by opcode?
 	// ADC
 	INSTRUCTIONS[0x69] = MAKE_INSTR(addressImmediate, adc, 2, 0);
 	INSTRUCTIONS[0x65] = MAKE_INSTR(addressZP, adc, 3, 0);
@@ -171,7 +177,6 @@ static void InitInstructionTable()
 	// JMP
 	INSTRUCTIONS[0x4C] = MAKE_INSTR(addressAbs, jmp, 3, 0);
 	INSTRUCTIONS[0x6C] = MAKE_INSTR(addressI, jmp, 5, 0);
-	// TODO: indirect fetch bug here...
 
 	// JSR
 	INSTRUCTIONS[0x20] = MAKE_INSTR(addressAbs, jsr, 6, 0);
@@ -184,7 +189,7 @@ static void InitInstructionTable()
 	INSTRUCTIONS[0xBD] = MAKE_INSTR(addressAbsX, lda, 4, Instruction::FLAG_CYCLE_PAGE_CROSSED);
 	INSTRUCTIONS[0xB9] = MAKE_INSTR(addressAbsY, lda, 4, Instruction::FLAG_CYCLE_PAGE_CROSSED);
 	INSTRUCTIONS[0xA1] = MAKE_INSTR(addressIX, lda, 6, 0);
-	INSTRUCTIONS[0xA1] = MAKE_INSTR(addressIY, lda, 5, Instruction::FLAG_CYCLE_PAGE_CROSSED);
+	INSTRUCTIONS[0xB1] = MAKE_INSTR(addressIY, lda, 5, Instruction::FLAG_CYCLE_PAGE_CROSSED);
 
 	// LDX
 	INSTRUCTIONS[0xA2] = MAKE_INSTR(addressImmediate, ldx, 2, 0);
@@ -330,6 +335,8 @@ CPU6502::CPU6502(IMemory* mem)
 	, flags({ 0 })
 	, memory(mem)
 	, address(0)
+    , mInstruction(nullptr)
+    , mCmdCnt(0)
 {
 	// TODO: init static?
 	InitInstructionTable();
@@ -343,15 +350,24 @@ CPU6502::~CPU6502()
 
 inline static uint16_t MakeAddress(uint8_t first, uint8_t second)
 {
-	// TODO: check
-	return (static_cast<uint16_t>(first) << 8) | static_cast<uint16_t>(second);
+	return (static_cast<uint16_t>(second) << 8) | static_cast<uint16_t>(first);
 }
 
-inline static bool IsSamePage(uint16_t address1, uint16_t address2)
+inline static bool IsPageCrossed(uint16_t address1, uint16_t address2)
 {
-	// TODO: check
-	return (address1 & 0xFF) == (address2 & 0xFF);
+	return (address1 & 0xFF00) != (address2 & 0xFF00);
 }
+
+static uint8_t FlagsFromStack(uint8_t value)
+{
+    return value & 0xEF | 0x20;
+}
+
+static uint8_t FlagsToStack(uint8_t value)
+{
+    return value | 0x10;
+}
+
 
 void CPU6502::powerOn()
 {
@@ -359,7 +375,7 @@ void CPU6502::powerOn()
     a = 0;
     x = 0;
     y = 0;
-    pc = 0x24;
+    flags.values = 0x24;
     stack = 0xFD;
     cycles = 0;
 }
@@ -369,22 +385,24 @@ void CPU6502::reset()
     stack -= 3;
 }
 
-uint8_t CPU6502::read8()
+// TODO: memory reader class?
+uint8_t CPU6502::read8(uint16_t address)
 {
-	return memory->read(pc++);
+	return memory->read(address);
 }
 
-uint16_t CPU6502::read16()
+uint16_t CPU6502::read16(uint16_t address)
 {
-	uint8_t first = read8();
-	uint8_t second = read8();
+	uint8_t first = read8(address);
+	uint8_t second = read8(address + 1);
 	return MakeAddress(first, second);
 }
 
 uint16_t CPU6502::read16_bug(uint16_t address)
 {
 	uint16_t first = address;
-	uint16_t second = (address & 0xFF) | (static_cast<uint16_t>(static_cast<uint8_t>(first) + 1));
+    uint8_t lowPart = static_cast<uint8_t>(first) + 1;
+	uint16_t second = (address & 0xFF00) | lowPart;
 	uint8_t first_val = memory->read(first);
 	uint8_t second_val = memory->read(second);
 	return MakeAddress(first_val, second_val);
@@ -392,31 +410,33 @@ uint16_t CPU6502::read16_bug(uint16_t address)
 
 bool CPU6502::exec()
 {
-	uint8_t opcode = read8();
-	const Instruction& cmd = INSTRUCTIONS[opcode];
+	uint8_t opcode = read8(pc++);
+    mInstruction = &INSTRUCTIONS[opcode];
 
-	if (cmd.mFunc == nullptr) {
+	if (mInstruction->mFunc == nullptr) {
 		// TODO: assert;
+        assert(false && "Unknown instruction");
 		return false;
 	}
 
-	if (cmd.mAddressFunc != nullptr)
+    mIsPageCrossed = false;
+	if (mInstruction->mAddressFunc != nullptr)
 	{
-		(*this.*cmd.mAddressFunc)();
+		(*this.*mInstruction->mAddressFunc)();
 	}
 
-	(*this.*cmd.mFunc)();
+	(*this.*mInstruction->mFunc)();
 
-	cycles += cmd.mCycles;
-
-	if (cmd.mFlags & Instruction::FLAG_CYCLE_PAGE_CROSSED)
+    // Update cycles
+	cycles += mInstruction->mCycles;
+	if (mInstruction->mFlags & Instruction::FLAG_CYCLE_PAGE_CROSSED && mIsPageCrossed) // TODO: in address func?
 	{
-
-		// TODO: page crossed flag
+        ++cycles;
 	}
-	
-	// TODO: check?
-	return !flags.brk;
+
+	// TODO: return cycles?
+    ++mCmdCnt;
+	return true;
 }
 
 void CPU6502::setPC(uint16_t address)
@@ -439,7 +459,7 @@ void CPU6502::addressImmediate()
 void CPU6502::addressRelative()
 {
 	// Relative offset is stored in address here...
-	address = read8();
+	address = read8(pc++);
 }
 
 void CPU6502::addressZP()
@@ -459,7 +479,7 @@ void CPU6502::addressZPY()
 
 void CPU6502::addressZPWOffs(uint8_t offset)
 {
-	uint8_t value = read8() + offset;
+	uint8_t value = read8(pc++) + offset;
 	address = value;
 }
 
@@ -470,44 +490,45 @@ void CPU6502::addressAbs()
 
 void CPU6502::addressAbsX()
 {
-	addressAbsWOfs(x);
+	mIsPageCrossed = addressAbsWOfs(x);
 }
 
 void CPU6502::addressAbsY()
 {
-	addressAbsWOfs(y);
+    mIsPageCrossed = addressAbsWOfs(y);
 }
 
-void CPU6502::addressAbsWOfs(uint8_t offset)
+bool CPU6502::addressAbsWOfs(uint8_t offset)
 {
-	address = read16() + offset;
+    uint16_t baseAddress = read16(pc);
+    pc += 2;
+	address = baseAddress + offset;
+    return IsPageCrossed(address, baseAddress);
 }
 
 void CPU6502::addressIX()
 {
-	addressIWOffs(x);
+	addressIWOffs(x, 0);
 }
 
 void CPU6502::addressIY()
 {
-	addressIWOffs(y);
+    mIsPageCrossed = addressIWOffs(0, y);
 }
 
 void CPU6502::addressI()
 {
-	addressIWOffs(0);
+    uint16_t baseAddress = read16(pc);
+    pc += 2;
+    address = read16_bug(baseAddress);
 }
 
-void CPU6502::addressIWOffs(uint8_t offset)
+bool CPU6502::addressIWOffs(uint8_t x, uint8_t y)
 {
-	// TODO
-	uint16_t addr = read16_bug(0);
-	// TODO: bug simulator
-	uint8_t val_first = memory->read(addr);
-	uint8_t val_second = memory->read(addr + 1) + offset; // TODO: check
-	address = MakeAddress(val_first, val_second);
-
-	// TODO: page crossed flag
+    uint8_t indirectionAddr = read8(pc++) + x;
+    uint16_t baseAddress = read16_bug(indirectionAddr);
+    address = baseAddress + static_cast<uint16_t>(y);
+    return IsPageCrossed(baseAddress, address);
 }
 
 void CPU6502::updateZeroNegativeFlags(uint8_t value)
@@ -524,8 +545,10 @@ void CPU6502::stackPush8(uint8_t value)
 
 void CPU6502::stackPush16(uint16_t value)
 {
-	stackPush8(value & 0xFF);
-	stackPush8((value >> 8) & 0xFF); // TODO: check
+    uint8_t valLow = value & 0xFF;
+    uint8_t valHi = (value >> 8) & 0xFF;	
+	stackPush8(valHi);
+    stackPush8(valLow);
 }
 
 uint8_t CPU6502::stackPop8()
@@ -535,10 +558,10 @@ uint8_t CPU6502::stackPop8()
 }
 
 uint16_t CPU6502::stackPop16()
-{
-	uint8_t second = stackPop8();
-	uint8_t first = stackPop8();
-	return MakeAddress(first, second); // TODO: check
+{	
+	uint8_t valLow = stackPop8();
+    uint8_t valHigh = stackPop8();
+	return MakeAddress(valLow, valHigh);
 }
 
 // Load / Store Operations
@@ -584,7 +607,7 @@ void CPU6502::tax()
 
 void CPU6502::tay()
 {
-	x = a;
+	y = a;
 	updateZeroNegativeFlags(y);
 }
 
@@ -619,7 +642,7 @@ void CPU6502::pha()
 
 void CPU6502::php()
 {
-	stackPush8(flags.values);
+	stackPush8(FlagsToStack(flags.values));
 }
 
 void CPU6502::pla()
@@ -630,7 +653,7 @@ void CPU6502::pla()
 
 void CPU6502::plp()
 {
-	flags.values = stackPop8();
+    flags.values = FlagsFromStack(stackPop8());
 }
 
 // Logical
@@ -654,41 +677,47 @@ void CPU6502::ora()
 
 void CPU6502::bit()
 {
-	uint8_t res = a & memory->read(address);
-	flags.negative = res & (1 << 7) ? 1 : 0;
-	flags.overflow = res & (1 << 6) ? 1 : 0;
-	flags.zero = res ? 0 : 1;
+	uint8_t value = memory->read(address);
+	flags.negative = value & (1 << 7) ? 1 : 0; // TODO: optimize flag sets
+	flags.overflow = value & (1 << 6) ? 1 : 0;
+	flags.zero = (value & a) == 0 ? 1 : 0;
 }
 
-static uint8_t CalcOverflow(uint8_t a, uint8_t b, uint8_t res)
+// TODO: eliminate
+static uint8_t CalcOverflowADC(uint8_t a, uint8_t b, uint8_t res)
 {
-	return (a ^ res) & (b ^ res) & 0x80;
+    return (((a^b) & 0x80) == 0 && ((a^res) & 0x80) != 0) ? 1 : 0;
+}
+
+static uint8_t CalcOverflowSBC(uint8_t a, uint8_t b, uint8_t res)
+{
+    return (((a^b) & 0x80) != 0 && ((a^res) & 0x80) != 0) ? 1 : 0;
 }
 
 // Arithmetic
 void CPU6502::adc()
 {
 	uint8_t src = memory->read(address);
-	uint16_t res = static_cast<uint16_t>(a) + src + flags.carry;
-	flags.carry = ((res & 0xFF00) > 0) ? 1 : 0;
-	flags.overflow = CalcOverflow(a, src, res);
-	a = static_cast<uint8_t>(res);
-	updateZeroNegativeFlags(a);
+    int16_t res = static_cast<int16_t>(a) + src + flags.carry;
+    flags.carry = res > 0xFF ? 1 : 0;
+	flags.overflow = CalcOverflowADC(a, src, res);
+    a = static_cast<uint8_t>(res);
+    updateZeroNegativeFlags(a);
 }
 
 void CPU6502::sbc()
 {
 	uint8_t src = memory->read(address);
-	uint16_t res = a - static_cast<uint16_t>(a) - src - ~flags.carry;
-	flags.carry = ((res & 0xFF00) > 0) ? 1 : 0;
-	flags.overflow = CalcOverflow(a, src, res);
-	a = static_cast<uint8_t>(res);
-	updateZeroNegativeFlags(a);
+	int16_t res = static_cast<int16_t>(a) - src - (1 - flags.carry);
+	flags.carry = res >= 0 ? 1 : 0;
+    flags.overflow = CalcOverflowSBC(a, src, res);
+    a = static_cast<uint8_t>(res);
+    updateZeroNegativeFlags(a);
 }
 
 void CPU6502::cmp()
 {
-	cmpWVal(y);
+	cmpWVal(a);
 }
 
 void CPU6502::cpx()
@@ -703,9 +732,10 @@ void CPU6502::cpy()
 
 void CPU6502::cmpWVal(uint8_t value)
 {
-	uint8_t res = value - memory->read(address);
-	flags.carry = (res >= 0) ? 1 : 0;
-	updateZeroNegativeFlags(res);
+	uint8_t res = value;
+    uint8_t src = memory->read(address);
+	flags.carry = (value >= src) ? 1 : 0;
+	updateZeroNegativeFlags(value - src);
 }
 
 // Increments & Decrements
@@ -761,7 +791,7 @@ void CPU6502::asl_a()
 
 uint8_t CPU6502::asl(uint8_t value)
 {
-	flags.carry = value & 0x80;
+	flags.carry = (value & 0x80) > 0 ? 1 : 0;
 	value <<= 1;
 	updateZeroNegativeFlags(value);
 	return value;
@@ -788,10 +818,8 @@ uint8_t CPU6502::lsr(uint8_t value)
 
 uint8_t CPU6502::rol(uint8_t value)
 {
-	uint8_t dst = value;
-	dst <<= 1;
-	// TODO: set bit 0 to carry
-	flags.carry = value & 0x80;
+	uint8_t dst = (value << 1) | flags.carry;	
+	flags.carry = ((value >> 7) & 0x1) > 0 ? 1 : 0;
 	updateZeroNegativeFlags(dst);
 	return dst;
 }
@@ -811,7 +839,7 @@ uint8_t CPU6502::ror(uint8_t value)
 {
 	uint8_t dst = value;
 	dst >>= 1;
-	// TODO: set bit 0 to carry
+    dst |= (flags.carry << 7);
 	flags.carry = value & 0x1;
 	updateZeroNegativeFlags(dst);
 	return dst;
@@ -853,7 +881,7 @@ void CPU6502::branchRelative()
 	pc += val;
 	// TODO: location check?
 	cycles += 1;
-	if (!IsSamePage(oldPc, pc))
+	if (IsPageCrossed(oldPc, pc))
 		cycles += 2;
 }
 
@@ -972,10 +1000,8 @@ void CPU6502::brk()
 void CPU6502::interrupt(uint16_t address)
 {
 	stackPush16(pc);
-	stackPush8(flags.values);
-	uint8_t byte1 = memory->read(address); // TODO: read16 method?
-	uint8_t byte2 = memory->read(address + 1);
-	pc = MakeAddress(byte1, byte2);
+	stackPush8(FlagsToStack(flags.values));
+    pc = read16(address);
 	flags.brk = 1;
 }
 
@@ -986,6 +1012,6 @@ void CPU6502::nop()
 
 void CPU6502::rti()
 {
-	flags.values = stackPop8();
+    flags.values = FlagsFromStack(stackPop8());
 	pc = stackPop16();
 }

@@ -5,9 +5,9 @@
 //static const uint16_t CONTROLLER_1_REGISTER_ADDR = 0x4016;
 //static const uint16_t CONTROLLER_2_REGISTER_ADDR = 0x4017;
 
-Bus::Bus(RAM* ram, JoyPad* joypad1, JoyPad* joypad2, CPU6502* cpu)
+Bus::Bus(IMemory* ram, IMemory* mapper, IMemory* joypad1, IMemory* joypad2)
     : mRam(ram)
-    , mCPU(cpu)
+    , mMapper(mapper)
 {
     mJoyPad[0] = joypad1;
     mJoyPad[1] = joypad2;
@@ -40,6 +40,7 @@ IMemory* Bus::mapAddress(uint16_t address, bool bRead, uint16_t& mirroredAddress
     else if (address == 0x4014)
     {
         // TODO: OAMDMA
+        assert(false || "OAMDMA not implemented");
     }
     else if (address < 0x4018)
     {
@@ -52,7 +53,7 @@ IMemory* Bus::mapAddress(uint16_t address, bool bRead, uint16_t& mirroredAddress
     }
     else
     {
-        pModule = mCartridge;
+        pModule = mMapper;
     }
     return pModule;
 }

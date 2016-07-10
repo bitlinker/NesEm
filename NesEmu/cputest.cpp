@@ -2,32 +2,17 @@
 #include <fstream>
 #include <string>
 #include <stdint.h>
+#include <cassert>
 #include <vector>
+#include <sstream>
+#include <iomanip>
+
 #include "CPU6502.h"
 #include "Cartridge.h"
+#include "NROM.h"
+#include "RAM.h"
+#include "Bus.h"
 
-
-class TestRam : public IMemory
-{
-public:
-    TestRam()
-        : mRAM(0xFFFF)
-    {
-    }
-
-    virtual void write(uint16_t address, uint8_t value)
-    {
-        mRAM[address] = value;
-    }
-
-    virtual uint8_t read(uint16_t address)
-    {
-        return mRAM[address];
-    }
-
-private:
-    std::vector<uint8_t> mRAM;
-};
 
 class CPUState
 {
@@ -69,31 +54,91 @@ public:
 
         instructionStr = str.substr(16, 32);
     }
+
+    void toString(std::string& str)
+    {
+        const uint32_t SIZE = 128;
+        char formatStr[SIZE];
+        sprintf_s(formatStr, SIZE, "%4X  %02X %02X %02X  %s %28s A:%02X X:%02X Y:%02X P:%02X SP:%02X CYC:%3d",
+            address,
+            instrData[0],
+            instrData[1], 
+            instrData[2], 
+            "",
+            "",
+            a, x, y, p, sp, cyc);            
+        str.assign(formatStr);
+    }
 };
+
+bool operator==(const CPUState& lhs, const CPUState& rhs)
+{
+    return  lhs.address == rhs.address &&
+        //lhs.instrData[0] == rhs.instrData[0] &&
+        lhs.a == rhs.a &&
+        lhs.x == rhs.x &&
+        lhs.y == rhs.y &&
+        lhs.sp == rhs.sp &&
+        lhs.p == rhs.p &&
+        lhs.cyc == rhs.cyc;
+}
 
 int main()
 {
     // http://www.qmtpro.com/~nes/misc/nestest.txt test    
-    TestRam testRam; // TODO: rm
-
     Cartridge testRom("d:\\!github\\NesEm\\Tests\\nestest\\nestest.nes");
+    uint32_t mapper = testRom.getMapper();
+    assert(mapper == 0);
+
+    NROM nrom(&testRom);
+    RAM ram(0x800);
+
+    Bus bus(&ram, &nrom, nullptr, nullptr);
+
+    uint8_t data = bus.read(0x8000);
+
 
     CPUState state;
 
-    CPU6502 cpu(&testRam);
-    cpu.setPC(0xC00); // Start location for auto tests
-
-    // TODO: load rom
+    CPU6502 cpu(&bus);
+    cpu.setPC(0xC000); // Start location for auto tests
 
     std::string tmpstr;
     std::ifstream stream("d:\\!github\\NesEm\\Tests\\nestest\\nestest.log", std::ifstream::in);
     while (stream.good())
     {
         std::getline(stream, tmpstr);
+        if (tmpstr.empty())
+        {
+            return 0;
+        }
+
         state.parseString(tmpstr);
+
+        CPUState realState;
+        realState.a = cpu.getA();
+        realState.x = cpu.getX();
+        realState.y = cpu.getY();
+        realState.sp = cpu.getSP();
+        realState.address = cpu.getPC();
+        realState.cyc = (cpu.getCycles() * 3) % 341; // Strange cycles conversion to fit the log
+        realState.p = cpu.getFlags();
+        for (int i = 0; i < 3; ++i) {
+            realState.instrData[i] = bus.read(realState.address + i);
+        }
+
+        std::string outStr;
+        realState.toString(outStr);
+        std::cout << outStr << std::endl;
+
+        if (!(state == realState))
+        {
+            return 1;
+        }
+
+        cpu.exec();
     }
 
-    cpu.exec();
-
+    
     return 0;
 }
