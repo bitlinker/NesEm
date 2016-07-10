@@ -27,11 +27,10 @@ public:
     };
 
 public:
-    void writeControl1(uint8_t value);
-    void writeTimer(uint8_t value);
-    void writeLengthTimer(uint8_t value);
+    void writeControl(uint8_t value);
     void writeSweep(uint8_t value);
-
+    void writeTimerLo(uint8_t value);
+    void writeTimerHi(uint8_t value);
 
 private:
     Control mControl;
@@ -42,7 +41,10 @@ private:
 
 class TriangleChannel
 {
-
+public:
+    void writeLinear(uint8_t value);
+    void writeTimerLo(uint8_t value);
+    void writeTimerHi(uint8_t value);
 };
 
 class DMCChannel

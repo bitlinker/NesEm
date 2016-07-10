@@ -33,7 +33,7 @@ public:
 		, mFunc(cpuFunc)
 		, mFlags(flags)
 	{
-		::strncpy(mName, name, MAX_INSTR_NAME);
+		::strncpy_s(mName, MAX_INSTR_NAME, name, MAX_INSTR_NAME);
 	}
 public:
 	pCpuFunc mAddressFunc;
@@ -524,21 +524,27 @@ static uint8_t FlagsToStack(uint8_t value)
     return value | 0x10;
 }
 
-
 void CPU6502::powerOn()
 {
-    // TODO: check
     a = 0;
     x = 0;
     y = 0;
     flags.values = 0x24;
     stack = 0xFD;
     cycles = 0;
+    mCmdCnt = 0;
 }
 
 void CPU6502::reset()
 {
-    stack -= 3;
+    pc = read16(RST_HANDLER_ADDR);    
+    flags.values = 0x24;
+    stack = 0xFD;
+}
+
+void CPU6502::nmi()
+{
+    interrupt(NMI_HANDLER_ADDR);
 }
 
 // TODO: memory reader class?
@@ -566,6 +572,8 @@ uint16_t CPU6502::read16_bug(uint16_t address)
 
 bool CPU6502::exec()
 {
+    // TODO: interrupt handler here...
+
 	uint8_t opcode = read8(pc++);
     mInstruction = &INSTRUCTIONS[opcode];
 
@@ -839,24 +847,13 @@ void CPU6502::bit()
 	flags.zero = (value & a) == 0 ? 1 : 0;
 }
 
-// TODO: eliminate
-static uint8_t CalcOverflowADC(uint8_t a, uint8_t b, uint8_t res)
-{
-    return (((a^b) & 0x80) == 0 && ((a^res) & 0x80) != 0) ? 1 : 0;
-}
-
-static uint8_t CalcOverflowSBC(uint8_t a, uint8_t b, uint8_t res)
-{
-    return (((a^b) & 0x80) != 0 && ((a^res) & 0x80) != 0) ? 1 : 0;
-}
-
 // Arithmetic
 void CPU6502::adc()
 {
 	uint8_t src = memory->read(address);
     int16_t res = static_cast<int16_t>(a) + src + flags.carry;
     flags.carry = res > 0xFF ? 1 : 0;
-	flags.overflow = CalcOverflowADC(a, src, res);
+	flags.overflow = (((a ^ src) & 0x80) == 0 && ((a ^ res) & 0x80) != 0) ? 1 : 0;
     a = static_cast<uint8_t>(res);
     updateZeroNegativeFlags(a);
 }
@@ -866,7 +863,7 @@ void CPU6502::sbc()
 	uint8_t src = memory->read(address);
 	int16_t res = static_cast<int16_t>(a) - src - (1 - flags.carry);
 	flags.carry = res >= 0 ? 1 : 0;
-    flags.overflow = CalcOverflowSBC(a, src, res);
+    flags.overflow = (((a ^ src) & 0x80) != 0 && ((a ^ res) & 0x80) != 0) ? 1 : 0;
     a = static_cast<uint8_t>(res);
     updateZeroNegativeFlags(a);
 }

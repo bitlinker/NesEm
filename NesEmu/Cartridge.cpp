@@ -8,7 +8,8 @@ static const char HEADER_MAGIC[] = { 'N', 'E', 'S', 0x1A };
 
 Cartridge::Cartridge(const std::string& filename)
 {
-    FILE *f = fopen(filename.c_str(), "rb");
+    FILE *f = nullptr;
+    fopen_s(&f, filename.c_str(), "rb");
 	fread(&mHeader, sizeof(mHeader), 1, f);
 
     if (::memcmp(mHeader.mMagic, HEADER_MAGIC, 4) != 0)

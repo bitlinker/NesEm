@@ -11,6 +11,13 @@
 
 //The NTSC NES runs at 1.7897725MHz, and 1.773447MHz for PAL
 
+// TODO:
+// - Move instruction to class
+// - Make address modes enum (or classes)
+// - Get number of bytes from address mode
+// - Make printout from address mode & instruction
+// - Update static instruction table
+// - Update interrupt routines & priorities
 
 class Instruction;
 
@@ -54,6 +61,7 @@ public:
 
     void powerOn();
     void reset();
+    void nmi();
 
 	bool exec();
 
