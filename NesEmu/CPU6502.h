@@ -18,41 +18,52 @@
 // - Make printout from address mode & instruction
 // - Update static instruction table
 // - Update interrupt routines & priorities
+// - Logger class
 
 class Instruction;
 
 class CPU6502
 {
+public:
+    union TFlags
+    {
+        struct
+        {
+            uint8_t carry : 1;
+            uint8_t zero : 1;
+            uint8_t interrupt_disable : 1;
+            uint8_t decimal_mode : 1;
+            uint8_t brk : 1;
+            uint8_t unused : 1;
+            uint8_t overflow : 1;
+            uint8_t negative : 1;
+        };
+        uint8_t values;
+    };
+
+    enum InterruptMode
+    {
+        InterruptNone,
+        InterruptNMI,
+        InterruptIRQ,
+    };
+
 private:
-	uint16_t pc;
-	uint8_t a, x, y;
-	uint8_t stack;
-	uint32_t cycles;
+	uint16_t mPC;
+	uint8_t mA, mX, mY;
+	uint8_t mSP;
+	TFlags mFlags;
+    InterruptMode mInterruptMode;
 
-	union TFlags
-	{
-		struct
-		{
-			uint8_t carry : 1;
-			uint8_t zero : 1;
-			uint8_t interrupt_disable : 1;
-			uint8_t decimal_mode : 1;
-			uint8_t brk : 1;
-			uint8_t unused : 1;
-			uint8_t overflow : 1;
-			uint8_t negative : 1;
-		};
-		uint8_t values;
-	};
-	TFlags flags;
+    uint64_t mCycles;
 
-	IMemory* memory;
+	IMemory* mMemory;
 
 
-    // Current internal data:	
-	uint16_t address;                    // Current address for instruction
-    bool mIsPageCrossed;
-    Instruction* mInstruction;           // Instruction
+    // Current instruction execution data:	
+	uint16_t mAddress;                      // Current address for instruction
+    bool mIsPageCrossed;                    // Page cross flag
+    const Instruction* mInstruction;        // Current instruction
     uint32_t mCmdCnt;
 	  
 public:
@@ -61,19 +72,21 @@ public:
 
     void powerOn();
     void reset();
-    void nmi();
 
-	bool exec();
+    void nmi();
+    void irq();
+
+    uint64_t exec();
 
     void setPC(uint16_t address);
 
-    uint8_t getA() { return a; }
-    uint8_t getX() { return x; }
-    uint8_t getY() { return y; }
-    uint8_t getSP() { return stack; }
-    uint16_t getPC() { return pc; }
-    uint8_t getFlags() { return flags.values; }
-    uint32_t getCycles() { return cycles; }
+    uint8_t getA() { return mA; }
+    uint8_t getX() { return mX; }
+    uint8_t getY() { return mY; }
+    uint8_t getSP() { return mSP; }
+    uint16_t getPC() { return mPC; }
+    uint8_t getFlags() { return mFlags.values; }
+    uint64_t getCycles() { return mCycles; }
 
 public:
 	void addressImplied();
@@ -98,7 +111,7 @@ private:
 	uint16_t read16(uint16_t address);
 	uint16_t read16_bug(uint16_t address);
 
-	void updateZeroNegativeFlags(uint8_t value);
+	void updateZNFlags(uint8_t value);
 	void cmpWVal(uint8_t value);
 
 	void branchRelative();

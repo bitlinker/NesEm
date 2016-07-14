@@ -5,7 +5,7 @@
 //static const uint16_t CONTROLLER_1_REGISTER_ADDR = 0x4016;
 //static const uint16_t CONTROLLER_2_REGISTER_ADDR = 0x4017;
 
-Bus::Bus(IMemory* ram, IMemory* mapper, IMemory* joypad1, IMemory* joypad2, IMemory* apu, IMemory* ppu)
+Bus::Bus(IMemory* ram, IMapper* mapper, IMemory* joypad1, IMemory* joypad2, IMemory* apu, IMemory* ppu)
     : mRam(ram)
     , mMapper(mapper)
     , mAPU(apu)
@@ -32,7 +32,7 @@ IMemory* Bus::mapAddress(uint16_t address, bool bRead, uint16_t& mirroredAddress
     }
     else if (address < 0x4000)
     {
-        mirroredAddress = address % 0x8;
+        mirroredAddress = 0x2000 + address % 0x8;
         pModule = mPPU;
     }
     else if (address <= 0x4015 && address != 0x4014)

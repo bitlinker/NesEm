@@ -68,6 +68,7 @@ public:
     std::vector<uint8_t>& getChrROM() { return mChrROM; }
 
     uint32_t getMapper();
+    bool isHorizontalMirroring();
 
 
 private:

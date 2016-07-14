@@ -52,3 +52,8 @@ uint32_t Cartridge::getMapper()
     uint8_t mapper = (mHeader.mFlags7.mMapperHigh << 4) | mHeader.mFlags6.mMapperLow;
     return mapper;
 }
+
+bool Cartridge::isHorizontalMirroring()
+{
+    return mHeader.mFlags6.mHorizontalMirroring > 0;
+}

@@ -1,11 +1,12 @@
 #pragma once
 #include <stdint.h>
+#include "IMapper.h"
 #include "IMemory.h"
 
 class Bus : public IMemory
 {
 public:
-	Bus(IMemory* ram, IMemory* mapper, IMemory* joypad1, IMemory* joypad2, IMemory* apu, IMemory* ppu);
+	Bus(IMemory* ram, IMapper* mapper, IMemory* joypad1, IMemory* joypad2, IMemory* apu, IMemory* ppu);
 	virtual ~Bus();
 
 	virtual uint8_t read(uint16_t address);
@@ -18,7 +19,7 @@ private:
     IMemory* mRam;
     IMemory* mPPU;
     IMemory* mAPU;
-    IMemory* mMapper;
+    IMapper* mMapper;
 	IMemory* mJoyPad[2];    
 };
 

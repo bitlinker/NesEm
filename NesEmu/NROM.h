@@ -1,16 +1,19 @@
 #pragma once
-#include "IMemory.h"
 #include "Cartridge.h"
+#include "IMapper.h"
 
-class NROM : public IMemory
+class NROM : public IMapper
 {
 public:
     NROM(Cartridge* mCartridge);
-    ~NROM();
+    virtual ~NROM();
 
 public:
+    // Mapper implementation:
     virtual void write(uint16_t address, uint8_t value);
     virtual uint8_t read(uint16_t address);
+
+    virtual Mirroring getMirroring();
 
 private:
     bool mapAddress(uint16_t address, uint8_t** ptr);

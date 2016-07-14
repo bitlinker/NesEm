@@ -148,6 +148,7 @@
     <ClCompile Include="JoyPad.cpp" />
     <ClCompile Include="CPU6502.cpp" />
     <ClCompile Include="NROM.cpp" />
+    <ClCompile Include="Palette.cpp" />
     <ClCompile Include="RAM.cpp" />
     <ClCompile Include="PPU.cpp" />
     <ClCompile Include="Cartridge.cpp" />
@@ -156,9 +157,11 @@
     <ClInclude Include="APU.h" />
     <ClInclude Include="Bus.h" />
     <ClInclude Include="CPU6502.h" />
+    <ClInclude Include="IMapper.h" />
     <ClInclude Include="IMemory.h" />
     <ClInclude Include="JoyPad.h" />
     <ClInclude Include="NROM.h" />
+    <ClInclude Include="Palette.h" />
     <ClInclude Include="RAM.h" />
     <ClInclude Include="PPU.h" />
     <ClInclude Include="Cartridge.h" />

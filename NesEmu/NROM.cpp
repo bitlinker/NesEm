@@ -64,4 +64,9 @@ uint8_t NROM::read(uint16_t address)
     return 0;
 }
 
+IMapper::Mirroring NROM::getMirroring()
+{
+    return mCartridge->isHorizontalMirroring() ? MIRROR_HORIZONTAL : MIRROR_VERTICAL;
+}
+
 // TODO: saving

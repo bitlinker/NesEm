@@ -99,29 +99,27 @@ int main()
     PPU ppu;
     JoyPad jp1;
     JoyPad jp2;
-
-
+    
     Bus bus(&ram, &nrom, &jp1, &jp2, &apu, &ppu);
-
-    uint8_t data = bus.read(0x8000);
-
 
     CPUState state;
 
     CPU6502 cpu(&bus);
+    ppu.setCPU(&cpu);
     cpu.setPC(0xC000); // Start location for auto tests
-
-    std::string tmpstr;
+    
+    std::string inStr;
+    std::string outStr;
     std::ifstream stream("d:\\!github\\NesEm\\Tests\\nestest\\nestest.log", std::ifstream::in);
     while (stream.good())
     {
-        std::getline(stream, tmpstr);
-        if (tmpstr.empty())
+        std::getline(stream, inStr);
+        if (inStr.empty())
         {
             return 0;
         }
 
-        state.parseString(tmpstr);
+        state.parseString(inStr);
 
         CPUState realState;
         realState.a = cpu.getA();
@@ -134,15 +132,18 @@ int main()
         for (int i = 0; i < 3; ++i) {
             realState.instrData[i] = bus.read(realState.address + i);
         }
-
-        std::string outStr;
-        realState.toString(outStr);
-        std::cout << outStr << std::endl;
+        
+        realState.toString(outStr);        
+        ::printf("%s\n", outStr.c_str());
 
         if (!(state == realState))
         {
             return 1;
         }
+
+        //ppu.exec();
+        //ppu.exec();
+        //ppu.exec();
 
         cpu.exec();
     }

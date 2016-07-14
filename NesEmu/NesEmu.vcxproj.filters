@@ -34,6 +34,7 @@
     <ClCompile Include="Cartridge.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
+    <ClCompile Include="Palette.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="APU.h">
@@ -63,5 +64,7 @@
     <ClInclude Include="Cartridge.h">
       <Filter>Sources</Filter>
     </ClInclude>
+    <ClInclude Include="Palette.h" />
+    <ClInclude Include="IMapper.h" />
   </ItemGroup>
 </Project>
