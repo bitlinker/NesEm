@@ -91,6 +91,26 @@ private:
     PaletteRam mPaletteRam;
 };
 
+class TvSystem
+{
+public:
+private:
+    uint64_t mBaseClock;
+    uint32_t mCpuDivider;
+    uint32_t mPpuDivider;
+    uint32_t mApuFrameClock;
+
+    uint32_t mPpuWidth;
+    uint32_t mPpuHeight;
+
+    uint32_t mPpuPostRenderScanlines; // "Post-render" blanking lines between end of picture and NMI
+    uint32_t mPpuVblankScanlines; // Length of vertical blanking after NMI
+    // Time during which OAM can be written TODO
+    uint32_t mPpuPreRenderScanlines; // "Pre-render" lines between vertical blanking and next picture
+    bool isBordersBlack;
+    bool isEmphasisRGInverted;
+};
+
 class PPU : public IMemory
 {
 public:
@@ -136,7 +156,7 @@ public:
 	};
 	
 public:
-	PPU();
+	PPU(const TvSystem& system);
 	virtual ~PPU();
 
     virtual void write(uint16_t address, uint8_t value);
@@ -166,6 +186,9 @@ private:
     uint8_t mScanline;
     uint16_t mRowCycle;
 
-    CPU6502* mCPU;
+    CPU6502* mCPU; // TODO: rm?
+
+    TvSystem mTvSystem;
+    std::vector<uint32_t> mBackBuffer;
 };
 
