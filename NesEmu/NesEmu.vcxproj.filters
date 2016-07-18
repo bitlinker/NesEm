@@ -24,7 +24,6 @@
     <ClCompile Include="PPU.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
-    <ClCompile Include="cputest.cpp" />
     <ClCompile Include="RAM.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
@@ -35,6 +34,8 @@
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="Palette.cpp" />
+    <ClCompile Include="MainWindow.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="APU.h">
@@ -66,5 +67,6 @@
     </ClInclude>
     <ClInclude Include="Palette.h" />
     <ClInclude Include="IMapper.h" />
+    <ClInclude Include="MainWindow.h" />
   </ItemGroup>
 </Project>

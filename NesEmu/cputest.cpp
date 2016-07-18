@@ -90,13 +90,17 @@ int main()
 {
     // http://www.qmtpro.com/~nes/misc/nestest.txt test    
     Cartridge testRom("d:\\!github\\NesEm\\Tests\\nestest\\nestest.nes");
+	//Cartridge testRom("D:\\!git_projects\\NesEmu\\Roms\\Final Fantasy (USA).nes");
+
+
     uint32_t mapper = testRom.getMapper();
     assert(mapper == 0);
 
     NROM nrom(&testRom);
     RAM ram(0x800);
     APU apu;
-    PPU ppu;
+	TvSystem sysetm;
+    PPU ppu(sysetm);
     JoyPad jp1;
     JoyPad jp2;
     

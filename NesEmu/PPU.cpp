@@ -35,6 +35,7 @@ static uint16_t PPUDATA_ADDRESS = 0x2007;
 static uint16_t OAMDMA_ADDRESS = 0x4014;
 
 PPU::PPU(const TvSystem& system)
+	: mVRAM(nullptr) // TODO
 {
     // TODO: init registers
     mOamData.resize(0xFF);

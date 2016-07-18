@@ -57,6 +57,31 @@ public:
     }
 
 private:
+	uint16_t mapMirroring(uint16_t address, IMapper::Mirroring mirroring)
+	{
+		// Address should be ralative (starting from 0)
+
+		// 0 1
+		// 2 3
+		uint16_t addressMap[4] = { 0 };
+		switch (mirroring) // TODO: get this map from mirroring class?
+		{
+		case IMapper::MIRROR_HORIZONTAL:
+			//addressMap = {0, 0, 0, 0};
+			break;
+		default:
+			break;
+		}
+
+		// TODO: 2k ram. Nametables normally
+
+		const uint16_t MIRROR_PAGE_SIZE = 0x400; // 1024 bytes
+		uint16_t page = address / MIRROR_PAGE_SIZE;
+		uint16_t offset = address % MIRROR_PAGE_SIZE;
+		uint16_t finalAddress = addressMap[page] * MIRROR_PAGE_SIZE + offset;
+		return finalAddress;
+	}
+
     uint16_t mapAddress(uint16_t address)
     {
         uint16_t mirroredAddress = address;
@@ -70,11 +95,8 @@ private:
         }
         else if (address < 0x3F00) // Name tables
         {
-            mirroredAddress = 0x2000 + address % 0x1000;
-
-            // TODO: nametable mirroring
-            // TODO: 2k ram. Nametables normally
-            mMapper->getMirroring();
+			mirroredAddress = address % 0x1000;
+			mirroredAddress = 0x2000 + mapMirroring(mirroredAddress, mMapper->getMirroring());
         }
         // TODO: all above can be configured by mapper!
         else // Palettes RAM
