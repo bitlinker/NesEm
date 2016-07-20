@@ -1,8 +1,12 @@
 #pragma once
+#include <cassert>
 #include <stdint.h>
 #include <vector>
 #include "IMemory.h"
 #include "IMapper.h"
+#include "TvSystem.h"
+#include "Palette.h"
+#include "INmiListener.h"
 
 class CPU6502;
 
@@ -39,99 +43,7 @@ public:
 };
 
 
-class PPUBus : public IMemory
-{
-public:
-    PPUBus(IMapper* mapper)
-        : mMapper(mapper)
-    {
-    }
 
-    // TODO: and mirroring
-    virtual void write(uint16_t address, uint8_t value)
-    {
-    }
-    virtual uint8_t read(uint16_t address)
-    {
-        return 0;
-    }
-
-private:
-	uint16_t mapMirroring(uint16_t address, IMapper::Mirroring mirroring)
-	{
-		// Address should be ralative (starting from 0)
-
-		// 0 1
-		// 2 3
-		uint16_t addressMap[4] = { 0 };
-		switch (mirroring) // TODO: get this map from mirroring class?
-		{
-		case IMapper::MIRROR_HORIZONTAL:
-			//addressMap = {0, 0, 0, 0};
-			break;
-		default:
-			break;
-		}
-
-		// TODO: 2k ram. Nametables normally
-
-		const uint16_t MIRROR_PAGE_SIZE = 0x400; // 1024 bytes
-		uint16_t page = address / MIRROR_PAGE_SIZE;
-		uint16_t offset = address % MIRROR_PAGE_SIZE;
-		uint16_t finalAddress = addressMap[page] * MIRROR_PAGE_SIZE + offset;
-		return finalAddress;
-	}
-
-    uint16_t mapAddress(uint16_t address)
-    {
-        uint16_t mirroredAddress = address;
-        if (address < 0x1000) // Pattern table 1
-        {
-            
-        }
-        else if (address < 0x2000) // Pattern table 2
-        {
-            
-        }
-        else if (address < 0x3F00) // Name tables
-        {
-			mirroredAddress = address % 0x1000;
-			mirroredAddress = 0x2000 + mapMirroring(mirroredAddress, mMapper->getMirroring());
-        }
-        // TODO: all above can be configured by mapper!
-        else // Palettes RAM
-        {
-            mirroredAddress = 0x3F00 + address % 0x20;
-        }
-
-        // TODO: io devices
-        return mirroredAddress;
-    }
-
-private:
-    IMapper* mMapper;
-    PaletteRam mPaletteRam;
-};
-
-class TvSystem
-{
-public:
-private:
-    uint64_t mBaseClock;
-    uint32_t mCpuDivider;
-    uint32_t mPpuDivider;
-    uint32_t mApuFrameClock;
-
-    uint32_t mPpuWidth;
-    uint32_t mPpuHeight;
-
-    uint32_t mPpuPostRenderScanlines; // "Post-render" blanking lines between end of picture and NMI
-    uint32_t mPpuVblankScanlines; // Length of vertical blanking after NMI
-    // Time during which OAM can be written TODO
-    uint32_t mPpuPreRenderScanlines; // "Pre-render" lines between vertical blanking and next picture
-    bool isBordersBlack;
-    bool isEmphasisRGInverted;
-};
 
 class PPU : public IMemory
 {
@@ -187,8 +99,18 @@ public:
     void setCPU(CPU6502* cpu) { mCPU = cpu; }
     void exec();
 
+    const std::vector<uint32_t>& getBuffer() const { return mBackBuffer; }
+    uint32_t getWidth() const { return mTvSystem.getPpuWidth(); }
+    uint32_t getHeight() const { return mTvSystem.getPpuHeight(); }
+
+    void setNmiListener(INmiListener* nmiListener) { mNmiListener = nmiListener; }
+
+    // TODO: palette setter
+
 private:
     void incAddress();
+
+    void drawStupid();
 
 private:
     Control mControl;
@@ -203,14 +125,18 @@ private:
     uint8_t mAddressLatch;
     uint16_t mAddress;
 
-    PPUBus mVRAM;
+    //PPUBus mVRAM;
 
     uint8_t mScanline;
     uint16_t mRowCycle;
 
+    Palette mPalette;
+
     CPU6502* mCPU; // TODO: rm?
 
-    TvSystem mTvSystem;
+    const TvSystem& mTvSystem;
     std::vector<uint32_t> mBackBuffer;
+
+    INmiListener* mNmiListener;
 };
 

@@ -30,12 +30,14 @@ public:
         for (uint32_t c = 0; c < MAX_COLORS; ++c)
         {
             uint16_t src = *dataBcd9bit++;
-            uint8_t r = src / 100;
-            uint8_t g = (src - r * 100) / 10;
+            uint8_t r = (src / 100);
+            uint8_t g = ((src - r * 100) / 10);
             uint8_t b = (src - r * 100 - g * 10);
+            r *= 36;
+            g *= 36;
+            b *= 36;
             *dst++ = (r | g << 8 | (b << 16) | (0xFF << 24));
         }
-
     }
 
     uint32_t getColor(uint8_t color)

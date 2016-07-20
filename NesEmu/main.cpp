@@ -9,6 +9,8 @@
 
 #include "MainWindow.h"
 
+#include "Console.h"
+
 #include "CPU6502.h"
 #include "Cartridge.h"
 #include "NROM.h"
@@ -18,35 +20,39 @@
 #include "JoyPad.h"
 #include "Bus.h"
 
-int main()
+int main(int argc, char **argv)
 {
+    if (argc != 2)
+    {
+        std::cout << "Usage: NesEm rom.nes" << std::endl;
+        return -1;
+    }
+
+    Console console;
+
 	//Cartridge testRom("d:\\!git_projects\\NesEmu\\Tests\\nestest\\nestest.nes");
-	Cartridge testRom("D:\\!git_projects\\NesEmu\\Roms\\Battle City (Japan).nes");
+	Cartridge testRom(argv[1]);
 
 	uint32_t mapper = testRom.getMapper();
 	assert(mapper == 0);
 
 	NROM nrom(&testRom);
 	RAM ram(0x800);
-	APU apu;
-	TvSystem sysetm;
-	PPU ppu(sysetm);
-	JoyPad jp1;
-	JoyPad jp2;
+    APU apu;
 
-	Bus bus(&ram, &nrom, &jp1, &jp2, &apu, &ppu);
+	Bus bus(&ram, &nrom, console.getJoyPad(0).get(), console.getJoyPad(1).get(), &apu, console.getPPU().get());
 
 	CPU6502 cpu(&bus);
-	ppu.setCPU(&cpu);
+    console.getPPU()->setCPU(&cpu); // TODO: rm
 	cpu.setPC(0xC000); // Start location for auto tests
 
-	MainWindow wnd;
+	MainWindow wnd(console);
 
 	while (wnd.update())
 	{
-		ppu.exec();
-		ppu.exec();
-		ppu.exec();
+        console.getPPU()->exec();
+        console.getPPU()->exec();
+        console.getPPU()->exec();
 		cpu.exec();
 	}
 

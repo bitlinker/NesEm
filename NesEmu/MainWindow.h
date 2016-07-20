@@ -1,20 +1,47 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include "Console.h"
+#include "INmiListener.h"
 
-class ConsoleComponents
-{
-	// TODO: singleton pool
-};
-
-class MainWindow
+class KeyBinding
 {
 public:
-	MainWindow();
-	~MainWindow();
+    KeyBinding(const std::shared_ptr<JoyPad>& joypad, JoyPad::Buttons button)
+        : mJoyPad(joypad)
+        , mButton(button)
+    {
+    }
 
-	bool update();
+public:
+    // TODO: encapsulate?
+    std::shared_ptr<JoyPad> mJoyPad;
+    JoyPad::Buttons mButton;
+};
+
+class MainWindow : public INmiListener
+{
+public:
+    MainWindow(Console& console);
+    ~MainWindow();
+
+    bool update();
+
+    // INmiListener:
+    virtual void onNMI();
 
 private:
-	sf::RenderWindow mWindow;
+    void init();
+    void initKeyBindings();
+
+private:
+    sf::RenderWindow mWindow;
+    sf::Texture mPpuTexture;
+    sf::Sprite mPpuSprite;
+
+    std::map<sf::Keyboard::Key, KeyBinding> mKeyBindMap;
+
+    Console& mConsole;
+
+    bool mIsNmiOccured;
 };
 

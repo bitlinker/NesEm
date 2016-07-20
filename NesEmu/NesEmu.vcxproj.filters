@@ -7,6 +7,9 @@
     <Filter Include="Sources\Mappers">
       <UniqueIdentifier>{92b92d55-4081-430c-88d0-2824d673e571}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\PPU">
+      <UniqueIdentifier>{884b104d-a621-4bba-a029-b9e7dd604379}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="APU.cpp">
@@ -21,9 +24,6 @@
     <ClCompile Include="JoyPad.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
-    <ClCompile Include="PPU.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
     <ClCompile Include="RAM.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
@@ -33,9 +33,19 @@
     <ClCompile Include="Cartridge.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
-    <ClCompile Include="Palette.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Console.cpp" />
+    <ClCompile Include="TvSystem.cpp" />
+    <ClCompile Include="PPU.cpp">
+      <Filter>Sources\PPU</Filter>
+    </ClCompile>
+    <ClCompile Include="PpuBus.cpp">
+      <Filter>Sources\PPU</Filter>
+    </ClCompile>
+    <ClCompile Include="Palette.cpp">
+      <Filter>Sources\PPU</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="APU.h">
@@ -50,9 +60,6 @@
     <ClInclude Include="JoyPad.h">
       <Filter>Sources</Filter>
     </ClInclude>
-    <ClInclude Include="PPU.h">
-      <Filter>Sources</Filter>
-    </ClInclude>
     <ClInclude Include="IMemory.h">
       <Filter>Sources</Filter>
     </ClInclude>
@@ -65,8 +72,19 @@
     <ClInclude Include="Cartridge.h">
       <Filter>Sources</Filter>
     </ClInclude>
-    <ClInclude Include="Palette.h" />
     <ClInclude Include="IMapper.h" />
     <ClInclude Include="MainWindow.h" />
+    <ClInclude Include="Console.h" />
+    <ClInclude Include="TvSystem.h" />
+    <ClInclude Include="INmiListener.h" />
+    <ClInclude Include="PPU.h">
+      <Filter>Sources\PPU</Filter>
+    </ClInclude>
+    <ClInclude Include="PpuBus.h">
+      <Filter>Sources\PPU</Filter>
+    </ClInclude>
+    <ClInclude Include="Palette.h">
+      <Filter>Sources\PPU</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
