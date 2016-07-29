@@ -67,7 +67,7 @@ PPU::~PPU()
 {
 }
 
-uint8_t PPU::read(uint16_t address)
+uint8_t PPU::readCpu(uint16_t address)
 {
     if (address == PPUSTATUS_ADDRESS)
     {
@@ -88,7 +88,7 @@ uint8_t PPU::read(uint16_t address)
     return 0;
 }
 
-void PPU::write(uint16_t address, uint8_t value)
+void PPU::writeCpu(uint16_t address, uint8_t value)
 {
     if (address == PPUCTRL_ADDRESS)
     {
@@ -138,6 +138,18 @@ void PPU::write(uint16_t address, uint8_t value)
         for (uint8_t i = 0; i < 0xFF; ++i)
             mOamData[mOamAddress++] = 0; // TODO: cpu ram here...
     }
+}
+
+void PPU::writePpu(uint16_t address, uint8_t value)
+{
+    // TODO: mapper first, bus second
+    // TODO impl
+}
+
+uint8_t PPU::readPpu(uint16_t address)
+{
+    // TODO impl
+    return 0;
 }
 
 
@@ -196,9 +208,9 @@ void PPU::drawStupid()
                 uint16_t ntAddress = 0x2000 + mControl.nameTableAddress * 0x400;
                 // TODO: scrolling?
                 uint16_t ntCharAddress = ntAddress + ntY * 32 + ntX;
-                uint8_t ntChar = mPpuBus->read8(ntCharAddress);
+                uint8_t ntChar = mPpuBus->readPpu(ntCharAddress);
                 uint16_t ntAttrAddress = ntAddress + (32 * 30) + (ntY * 32 + ntX) / 4; // TODO: check
-                uint8_t ntAttr = mPpuBus->read8(ntAttrAddress);
+                uint8_t ntAttr = mPpuBus->readPpu(ntAttrAddress);
                 ntAttr &= 0x3; // TODO: offset for char
 
                 // Pattern table fetch:
@@ -209,12 +221,12 @@ void PPU::drawStupid()
                 uint8_t cX = x % 8;
                 uint8_t cY = y % 8;
 
-                uint8_t charLow = mPpuBus->read8(ptCharAddress + cY);
-                uint8_t charHigh = mPpuBus->read8(ptCharAddress + 8 + cY);
+                uint8_t charLow = mPpuBus->readPpu(ptCharAddress + cY);
+                uint8_t charHigh = mPpuBus->readPpu(ptCharAddress + 8 + cY);
                 
                 uint8_t pixelClr = ((charLow << cX) & 0x1) | (((charHigh << cX) & 0x1) << 0x1);
 
-                // Final color:
+                // Final color
                 uint8_t palIndex = pixelClr | (ntAttr << 2);
                 //ntAttr 
                 mBackBuffer[y * getWidth() + x] = mPalette.getColor(palIndex);

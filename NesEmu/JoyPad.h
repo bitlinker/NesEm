@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include "IMemory.h"
 
-class JoyPad : public IMemory
+class JoyPad : public ICpuMemory
 {
 public:
 	enum Buttons
@@ -24,8 +24,8 @@ public:
 
 	void setButton(Buttons button, bool value);
 
-    virtual void write(uint16_t address, uint8_t value);
-    virtual uint8_t read(uint16_t address);
+    virtual void writeCpu(uint16_t address, uint8_t value);
+    virtual uint8_t readCpu(uint16_t address);
 
 private:
 	bool mButton[BTN_MAX];

@@ -3,7 +3,7 @@
 #include "IMapper.h"
 #include <stdint.h>
 
-class PPUBus : public IMemory
+class PPUBus : public ICpuMemory
 {
 public:
     PPUBus(IMapper* mapper)
@@ -12,10 +12,10 @@ public:
     }
 
     // TODO: and mirroring
-    virtual void write(uint16_t address, uint8_t value)
+    virtual void writeCpu(uint16_t address, uint8_t value)
     {
     }
-    virtual uint8_t read(uint16_t address)
+    virtual uint8_t readCpu(uint16_t address)
     {
         return 0;
     }
@@ -23,7 +23,9 @@ public:
 private:
     uint16_t mapMirroring(uint16_t address, IMapper::Mirroring mirroring)
     {
-        // Address should be ralative (starting from 0)
+        address = address % 0x4000;
+
+        // Address should be relative (starting from 0)
 
         // 0 1
         // 2 3
@@ -49,13 +51,9 @@ private:
     uint16_t mapAddress(uint16_t address)
     {
         uint16_t mirroredAddress = address;
-        if (address < 0x1000) // Pattern table 1
+        if (address < 0x2000) // Pattern table 1, 2
         {
-
-        }
-        else if (address < 0x2000) // Pattern table 2
-        {
-
+            // TODO: from mapper
         }
         else if (address < 0x3F00) // Name tables
         {
@@ -66,6 +64,7 @@ private:
         else // Palettes RAM
         {
             mirroredAddress = 0x3F00 + address % 0x20;
+            // TODO: ppu ram
         }
 
         // TODO: io devices

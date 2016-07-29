@@ -73,7 +73,7 @@ APU::~APU()
 {
 }
 
-void APU::write(uint16_t address, uint8_t value)
+void APU::writeCpu(uint16_t address, uint8_t value)
 {
     if (address == 0x4000) // Pulse control 1
     {
@@ -87,7 +87,7 @@ void APU::write(uint16_t address, uint8_t value)
     // TODO
 }
 
-uint8_t APU::read(uint16_t address)
+uint8_t APU::readCpu(uint16_t address)
 {
     // TODO
     return 0;

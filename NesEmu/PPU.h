@@ -43,9 +43,7 @@ public:
 };
 
 
-
-
-class PPU : public IMemory
+class PPU : public ICpuMemory, public IPpuMemory
 {
 public:
 	union Control
@@ -93,8 +91,11 @@ public:
 	PPU(const TvSystem& system);
 	virtual ~PPU();
 
-    virtual void write(uint16_t address, uint8_t value);
-    virtual uint8_t read(uint16_t address);
+    virtual void writeCpu(uint16_t address, uint8_t value);
+    virtual uint8_t readCpu(uint16_t address);
+
+    virtual void writePpu(uint16_t address, uint8_t value);
+    virtual uint8_t readPpu(uint16_t address);
 
     void setCPU(CPU6502* cpu) { mCPU = cpu; }
     void exec();
@@ -125,7 +126,7 @@ private:
     uint8_t mAddressLatch;
     uint16_t mAddress;
 
-    //PPUBus mVRAM;
+    IPpuMemory* mPpuBus;
 
     uint8_t mScanline;
     uint16_t mRowCycle;

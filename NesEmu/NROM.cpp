@@ -42,7 +42,7 @@ bool NROM::mapAddress(uint16_t address, uint8_t** ptr)
     return true;
 }
 
-void NROM::write(uint16_t address, uint8_t value)
+void NROM::writeCpu(uint16_t address, uint8_t value)
 {
     uint8_t* ptr = nullptr;
     if (mapAddress(address, &ptr))
@@ -53,7 +53,7 @@ void NROM::write(uint16_t address, uint8_t value)
     // TODO: write-protected areas?
 }
 
-uint8_t NROM::read(uint16_t address)
+uint8_t NROM::readCpu(uint16_t address)
 {
     uint8_t* ptr = nullptr;
     if (mapAddress(address, &ptr))
@@ -67,6 +67,16 @@ uint8_t NROM::read(uint16_t address)
 IMapper::Mirroring NROM::getMirroring()
 {
     return mCartridge->isHorizontalMirroring() ? MIRROR_HORIZONTAL : MIRROR_VERTICAL;
+}
+
+void NROM::writePpu(uint16_t address, uint8_t value)
+{
+
+}
+
+uint8_t NROM::readPpu(uint16_t address)
+{
+    return 0;
 }
 
 // TODO: saving

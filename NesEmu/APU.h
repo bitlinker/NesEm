@@ -57,14 +57,14 @@ class NoiseChannel
 
 };
 
-class APU : public IMemory
+class APU : public ICpuMemory
 {
 public:
 	APU();
 	virtual ~APU();
 
-    virtual void write(uint16_t address, uint8_t value);
-    virtual uint8_t read(uint16_t address);
+    virtual void writeCpu(uint16_t address, uint8_t value);
+    virtual uint8_t readCpu(uint16_t address);
 
 private:
     PulseChannel mPulse1;

@@ -55,5 +55,6 @@ uint32_t Cartridge::getMapper()
 
 bool Cartridge::isHorizontalMirroring()
 {
+    // TODO: mFourScreenVRAM also
     return mHeader.mFlags6.mHorizontalMirroring > 0;
 }

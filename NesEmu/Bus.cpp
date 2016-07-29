@@ -5,7 +5,7 @@
 //static const uint16_t CONTROLLER_1_REGISTER_ADDR = 0x4016;
 //static const uint16_t CONTROLLER_2_REGISTER_ADDR = 0x4017;
 
-Bus::Bus(IMemory* ram, IMapper* mapper, IMemory* joypad1, IMemory* joypad2, IMemory* apu, IMemory* ppu)
+Bus::Bus(ICpuMemory* ram, IMapper* mapper, ICpuMemory* joypad1, ICpuMemory* joypad2, ICpuMemory* apu, ICpuMemory* ppu)
     : mRam(ram)
     , mMapper(mapper)
     , mAPU(apu)
@@ -20,9 +20,9 @@ Bus::~Bus()
 {
 }
 
-IMemory* Bus::mapAddress(uint16_t address, bool bRead, uint16_t& mirroredAddress)
+ICpuMemory* Bus::mapAddress(uint16_t address, bool bRead, uint16_t& mirroredAddress)
 {
-    IMemory* pModule = nullptr; // TODO: make devices itself decide memory operations?
+    ICpuMemory* pModule = nullptr; // TODO: make devices itself decide memory operations?
     mirroredAddress = address;
 
     if (address < 0x2000)
@@ -60,18 +60,18 @@ IMemory* Bus::mapAddress(uint16_t address, bool bRead, uint16_t& mirroredAddress
     return pModule;
 }
 
-uint8_t Bus::read(uint16_t address)
+uint8_t Bus::readCpu(uint16_t address)
 {
     uint16_t mirroredAddress;
-    IMemory* pModule = mapAddress(address, true, mirroredAddress);
+    ICpuMemory* pModule = mapAddress(address, true, mirroredAddress);
     assert(pModule);    
-    return pModule->read(mirroredAddress);
+    return pModule->readCpu(mirroredAddress);
 }
 
-void Bus::write(uint16_t address, uint8_t value)
+void Bus::writeCpu(uint16_t address, uint8_t value)
 {
     uint16_t mirroredAddress;
-    IMemory* pModule = mapAddress(address, false, mirroredAddress);
+    ICpuMemory* pModule = mapAddress(address, false, mirroredAddress);
     assert(pModule);
-    pModule->write(mirroredAddress, value);
+    pModule->writeCpu(mirroredAddress, value);
 }

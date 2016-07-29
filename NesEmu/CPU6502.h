@@ -57,7 +57,7 @@ private:
 
     uint64_t mCycles;
 
-	IMemory* mMemory;
+	ICpuMemory* mMemory;
 
 
     // Current instruction execution data:	
@@ -67,7 +67,7 @@ private:
     uint32_t mCmdCnt;
 	  
 public:
-	CPU6502(IMemory* memory);
+	CPU6502(ICpuMemory* memory);
 	~CPU6502();
 
     void powerOn();

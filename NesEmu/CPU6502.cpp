@@ -525,7 +525,7 @@ static const uint16_t NMI_HANDLER_ADDR = 0xFFFA;
 static const uint16_t RST_HANDLER_ADDR = 0xFFFC;
 static const uint16_t IRQ_HANDLER_ADDR = 0xFFFE;
 
-CPU6502::CPU6502(IMemory* mem)
+CPU6502::CPU6502(ICpuMemory* mem)
 	: mPC(PC_BASE_ADDRESS)
 	, mA(0)
 	, mX(0)
@@ -598,7 +598,7 @@ void CPU6502::irq()
 
 uint8_t CPU6502::read8(uint16_t address)
 {
-	return mMemory->read(address);
+	return mMemory->readCpu(address);
 }
 
 uint16_t CPU6502::read16(uint16_t address)
@@ -613,8 +613,8 @@ uint16_t CPU6502::read16_bug(uint16_t address)
 	uint16_t first = address;
     uint8_t lowPart = static_cast<uint8_t>(first) + 1;
 	uint16_t second = (address & 0xFF00) | lowPart;
-	uint8_t first_val = mMemory->read(first);
-	uint8_t second_val = mMemory->read(second);
+	uint8_t first_val = mMemory->readCpu(first);
+	uint8_t second_val = mMemory->readCpu(second);
 	return Make16(first_val, second_val);
 }
 
@@ -764,7 +764,7 @@ void CPU6502::stackPush8(uint8_t value)
 {
     // TODO: disabled for DBG
 	//assert(mSP > 0);
-	mMemory->write(STACK_BASE_ADDRESS + mSP--, value);
+	mMemory->writeCpu(STACK_BASE_ADDRESS + mSP--, value);
 }
 
 void CPU6502::stackPush16(uint16_t value)
@@ -779,7 +779,7 @@ uint8_t CPU6502::stackPop8()
 {
     // TODO: disabled for DBG
 	//assert(mSP < STACK_MAX_VAL);
-	return mMemory->read(STACK_BASE_ADDRESS + ++mSP);
+	return mMemory->readCpu(STACK_BASE_ADDRESS + ++mSP);
 }
 
 uint16_t CPU6502::stackPop16()
@@ -792,35 +792,35 @@ uint16_t CPU6502::stackPop16()
 // Load / Store Operations
 void CPU6502::lda()
 {
-	mA = mMemory->read(mAddress);
+	mA = mMemory->readCpu(mAddress);
 	updateZNFlags(mA);
 }
 
 void CPU6502::ldx()
 {
-	mX = mMemory->read(mAddress);
+	mX = mMemory->readCpu(mAddress);
 	updateZNFlags(mX);
 }
 
 void CPU6502::ldy()
 {
-	mY = mMemory->read(mAddress);
+	mY = mMemory->readCpu(mAddress);
 	updateZNFlags(mY);
 }
 
 void CPU6502::sta()
 {
-	mMemory->write(mAddress, mA);
+	mMemory->writeCpu(mAddress, mA);
 }
 
 void CPU6502::stx()
 {
-	mMemory->write(mAddress, mX);
+	mMemory->writeCpu(mAddress, mX);
 }
 
 void CPU6502::sty()
 {
-	mMemory->write(mAddress, mY);
+	mMemory->writeCpu(mAddress, mY);
 }
 
 // Register Transfers
@@ -884,25 +884,25 @@ void CPU6502::plp()
 // Logical
 void CPU6502::and()
 {
-	mA &= mMemory->read(mAddress);
+	mA &= mMemory->readCpu(mAddress);
 	updateZNFlags(mA);
 }
 
 void CPU6502::eor()
 {
-	mA ^= mMemory->read(mAddress);
+	mA ^= mMemory->readCpu(mAddress);
 	updateZNFlags(mA);
 }
 
 void CPU6502::ora()
 {
-	mA |= mMemory->read(mAddress);
+	mA |= mMemory->readCpu(mAddress);
 	updateZNFlags(mA);
 }
 
 void CPU6502::bit()
 {
-	uint8_t value = mMemory->read(mAddress);
+	uint8_t value = mMemory->readCpu(mAddress);
 	mFlags.negative = value & (1 << 7) ? 1 : 0; // TODO: optimize flag sets
 	mFlags.overflow = value & (1 << 6) ? 1 : 0;
 	mFlags.zero = (value & mA) == 0 ? 1 : 0;
@@ -911,7 +911,7 @@ void CPU6502::bit()
 // Arithmetic
 void CPU6502::adc()
 {
-	uint8_t src = mMemory->read(mAddress);
+	uint8_t src = mMemory->readCpu(mAddress);
     int16_t res = static_cast<int16_t>(mA) + src + mFlags.carry;
     mFlags.carry = res > 0xFF ? 1 : 0;
 	mFlags.overflow = (((mA ^ src) & 0x80) == 0 && ((mA ^ res) & 0x80) != 0) ? 1 : 0;
@@ -921,7 +921,7 @@ void CPU6502::adc()
 
 void CPU6502::sbc()
 {
-	uint8_t src = mMemory->read(mAddress);
+	uint8_t src = mMemory->readCpu(mAddress);
 	int16_t res = static_cast<int16_t>(mA) - src - (1 - mFlags.carry);
 	mFlags.carry = res >= 0 ? 1 : 0;
     mFlags.overflow = (((mA ^ src) & 0x80) != 0 && ((mA ^ res) & 0x80) != 0) ? 1 : 0;
@@ -947,7 +947,7 @@ void CPU6502::cpy()
 void CPU6502::cmpWVal(uint8_t value)
 {
 	uint8_t res = value;
-    uint8_t src = mMemory->read(mAddress);
+    uint8_t src = mMemory->readCpu(mAddress);
 	mFlags.carry = (value >= src) ? 1 : 0;
 	updateZNFlags(value - src);
 }
@@ -955,9 +955,9 @@ void CPU6502::cmpWVal(uint8_t value)
 // Increments & Decrements
 void CPU6502::inc()
 {
-	uint8_t dst = mMemory->read(mAddress) + 1;
+	uint8_t dst = mMemory->readCpu(mAddress) + 1;
 	updateZNFlags(dst);
-	mMemory->write(mAddress, dst);
+	mMemory->writeCpu(mAddress, dst);
 }
 
 void CPU6502::inx()
@@ -974,9 +974,9 @@ void CPU6502::iny()
 
 void CPU6502::dec()
 {
-	uint8_t dst = mMemory->read(mAddress) - 1;
+	uint8_t dst = mMemory->readCpu(mAddress) - 1;
 	updateZNFlags(dst);
-	mMemory->write(mAddress, dst);
+	mMemory->writeCpu(mAddress, dst);
 }
 
 void CPU6502::dex()
@@ -994,8 +994,8 @@ void CPU6502::dey()
 // Shifts
 void CPU6502::asl_m()
 {
-	uint8_t value = mMemory->read(mAddress);
-	mMemory->write(mAddress, asl(value));
+	uint8_t value = mMemory->readCpu(mAddress);
+	mMemory->writeCpu(mAddress, asl(value));
 }
 
 void CPU6502::asl_a()
@@ -1013,8 +1013,8 @@ uint8_t CPU6502::asl(uint8_t value)
 
 void CPU6502::lsr_m()
 {
-	uint8_t value = mMemory->read(mAddress);
-	mMemory->write(mAddress, lsr(value));
+	uint8_t value = mMemory->readCpu(mAddress);
+	mMemory->writeCpu(mAddress, lsr(value));
 }
 
 void CPU6502::lsr_a()
@@ -1040,8 +1040,8 @@ uint8_t CPU6502::rol(uint8_t value)
 
 void CPU6502::rol_m()
 {
-	uint8_t value = mMemory->read(mAddress);
-	mMemory->write(mAddress, rol(value));
+	uint8_t value = mMemory->readCpu(mAddress);
+	mMemory->writeCpu(mAddress, rol(value));
 }
 
 void CPU6502::rol_a()
@@ -1061,8 +1061,8 @@ uint8_t CPU6502::ror(uint8_t value)
 
 void CPU6502::ror_m()
 {
-	uint8_t value = mMemory->read(mAddress);
-	mMemory->write(mAddress, ror(value));
+	uint8_t value = mMemory->readCpu(mAddress);
+	mMemory->writeCpu(mAddress, ror(value));
 }
 
 void CPU6502::ror_a()
@@ -1240,7 +1240,7 @@ void CPU6502::aac()
 void CPU6502::sax()
 {  
     uint8_t value = mA & mX;
-    mMemory->write(mAddress, value);
+    mMemory->writeCpu(mAddress, value);
 }
 
 void CPU6502::arr()
@@ -1313,7 +1313,7 @@ void CPU6502::lar()
 
 void CPU6502::lax()
 {
-    uint8_t value = mMemory->read(mAddress);
+    uint8_t value = mMemory->readCpu(mAddress);
     mX = mA = value;
     updateZNFlags(value);
 }

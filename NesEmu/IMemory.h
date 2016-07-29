@@ -1,11 +1,20 @@
 #pragma once
 #include <stdint.h>
 
-class IMemory
+class ICpuMemory
 {
 public:
-	virtual void write(uint16_t address, uint8_t value) = 0;
-	virtual uint8_t read(uint16_t address) = 0;
+	virtual void writeCpu(uint16_t address, uint8_t value) = 0;
+	virtual uint8_t readCpu(uint16_t address) = 0;
 
-	virtual ~IMemory() {};
+	virtual ~ICpuMemory() {};
+};
+
+class IPpuMemory
+{
+public:
+    virtual void writePpu(uint16_t address, uint8_t value) = 0;
+    virtual uint8_t readPpu(uint16_t address) = 0;
+
+    virtual ~IPpuMemory() {};
 };

@@ -1,7 +1,7 @@
 #pragma once
 #include "IMemory.h"
 
-class IMapper : public IMemory
+class IMapper : public ICpuMemory
 {
 public:
     enum Mirroring

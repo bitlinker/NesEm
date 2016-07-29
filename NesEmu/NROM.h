@@ -10,10 +10,13 @@ public:
 
 public:
     // Mapper implementation:
-    virtual void write(uint16_t address, uint8_t value);
-    virtual uint8_t read(uint16_t address);
+    virtual void writeCpu(uint16_t address, uint8_t value);
+    virtual uint8_t readCpu(uint16_t address);
 
     virtual Mirroring getMirroring();
+
+    virtual void writePpu(uint16_t address, uint8_t value);
+    virtual uint8_t readPpu(uint16_t address);
 
 private:
     bool mapAddress(uint16_t address, uint8_t** ptr);
