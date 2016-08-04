@@ -19,7 +19,8 @@ public:
     virtual uint8_t readPpu(uint16_t address);
 
 private:
-    bool mapAddress(uint16_t address, uint8_t** ptr);
+    bool mapCpuAddress(uint16_t address, uint8_t** ptr);
+    bool mapPpuAddress(uint16_t address, uint8_t** ptr);
 
 private:
     Cartridge* mCartridge;

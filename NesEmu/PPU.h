@@ -6,42 +6,10 @@
 #include "IMapper.h"
 #include "TvSystem.h"
 #include "Palette.h"
+#include "PaletteRam.h"
 #include "INmiListener.h"
 
 class CPU6502;
-
-class PaletteRam
-{
-public:
-    static const uint16_t PALETTE_RAM_SIZE = 0x20;
-public:
-    PaletteRam()
-        : mValues(PALETTE_RAM_SIZE)
-    {
-    }
-
-    uint8_t getColorIndex(uint8_t indexRaw)
-    {
-        assert(indexRaw < PALETTE_RAM_SIZE);
-        return mValues[indexRaw];
-    }
-
-    // pixelClr : 2, palIndex : 2, isSprite : 1
-    uint8_t getColorIndex(uint8_t pixelClr, uint8_t palIndex, uint8_t isSprite)
-    {
-        uint8_t index = (pixelClr & 0x3) | ((palIndex & 0x3) << 2) | (isSprite << 4);
-        return getColorIndex(index);
-    }
-
-    uint8_t* getRawPtr()
-    {
-        return &mValues[0];
-    }
-
-public:
-    std::vector<uint8_t> mValues;
-};
-
 
 class PPU : public ICpuMemory, public IPpuMemory
 {
@@ -97,6 +65,8 @@ public:
     virtual void writePpu(uint16_t address, uint8_t value);
     virtual uint8_t readPpu(uint16_t address);
 
+    const PaletteRam& getPaletteRam() const { return mPaletteRam; }
+
     void setCPU(CPU6502* cpu) { mCPU = cpu; }
     void exec();
 
@@ -139,5 +109,8 @@ private:
     std::vector<uint32_t> mBackBuffer;
 
     INmiListener* mNmiListener;
+
+    PaletteRam mPaletteRam;
+
 };
 

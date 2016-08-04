@@ -20,7 +20,7 @@ Bus::~Bus()
 {
 }
 
-ICpuMemory* Bus::mapAddress(uint16_t address, bool bRead, uint16_t& mirroredAddress)
+ICpuMemory* Bus::mapCpuAddress(uint16_t address, bool bRead, uint16_t& mirroredAddress)
 {
     ICpuMemory* pModule = nullptr; // TODO: make devices itself decide memory operations?
     mirroredAddress = address;
@@ -63,7 +63,7 @@ ICpuMemory* Bus::mapAddress(uint16_t address, bool bRead, uint16_t& mirroredAddr
 uint8_t Bus::readCpu(uint16_t address)
 {
     uint16_t mirroredAddress;
-    ICpuMemory* pModule = mapAddress(address, true, mirroredAddress);
+    ICpuMemory* pModule = mapCpuAddress(address, true, mirroredAddress);
     assert(pModule);    
     return pModule->readCpu(mirroredAddress);
 }
@@ -71,7 +71,7 @@ uint8_t Bus::readCpu(uint16_t address)
 void Bus::writeCpu(uint16_t address, uint8_t value)
 {
     uint16_t mirroredAddress;
-    ICpuMemory* pModule = mapAddress(address, false, mirroredAddress);
+    ICpuMemory* pModule = mapCpuAddress(address, false, mirroredAddress);
     assert(pModule);
     pModule->writeCpu(mirroredAddress, value);
 }

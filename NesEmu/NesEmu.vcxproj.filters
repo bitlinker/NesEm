@@ -46,6 +46,9 @@
     <ClCompile Include="Palette.cpp">
       <Filter>Sources\PPU</Filter>
     </ClCompile>
+    <ClCompile Include="VRAM.cpp">
+      <Filter>Sources\PPU</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="APU.h">
@@ -84,6 +87,12 @@
       <Filter>Sources\PPU</Filter>
     </ClInclude>
     <ClInclude Include="Palette.h">
+      <Filter>Sources\PPU</Filter>
+    </ClInclude>
+    <ClInclude Include="PaletteRam.h">
+      <Filter>Sources\PPU</Filter>
+    </ClInclude>
+    <ClInclude Include="VRAM.h">
       <Filter>Sources\PPU</Filter>
     </ClInclude>
   </ItemGroup>

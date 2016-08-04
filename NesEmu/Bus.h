@@ -13,7 +13,7 @@ public:
     virtual void writeCpu(uint16_t address, uint8_t value);
 
 private:
-    ICpuMemory* mapAddress(uint16_t address, bool bRead, uint16_t& mirroredAddress);
+    ICpuMemory* mapCpuAddress(uint16_t address, bool bRead, uint16_t& mirroredAddress);
 
 private:
     ICpuMemory* mRam;

@@ -159,6 +159,7 @@
     <ClCompile Include="Cartridge.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="TvSystem.cpp" />
+    <ClCompile Include="VRAM.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="APU.h" />
@@ -171,12 +172,14 @@
     <ClInclude Include="JoyPad.h" />
     <ClInclude Include="NROM.h" />
     <ClInclude Include="Palette.h" />
+    <ClInclude Include="PaletteRam.h" />
     <ClInclude Include="PpuBus.h" />
     <ClInclude Include="RAM.h" />
     <ClInclude Include="PPU.h" />
     <ClInclude Include="Cartridge.h" />
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="TvSystem.h" />
+    <ClInclude Include="VRAM.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,7 +1,8 @@
 #include "RAM.h"
 #include <cassert>
 
-static const uint16_t RAM_SIZE = 0x2000;
+// TODO: rm
+//static const uint16_t RAM_SIZE = 0x2000;
 
 RAM::RAM(uint16_t capacity)
 	: mRAM(capacity)
