@@ -15,5 +15,7 @@ public:
 public:
     virtual Mirroring getMirroring() = 0;
 
+	mapPpuAddress
+
     virtual ~IMapper() {};
 };

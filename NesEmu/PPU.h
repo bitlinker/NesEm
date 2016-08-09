@@ -11,7 +11,7 @@
 
 class CPU6502;
 
-class PPU : public ICpuMemory, public IPpuMemory
+class PPU : public ICpuMemory
 {
 public:
 	union Control
@@ -65,7 +65,8 @@ public:
     virtual void writePpu(uint16_t address, uint8_t value);
     virtual uint8_t readPpu(uint16_t address);
 
-    const PaletteRam& getPaletteRam() const { return mPaletteRam; }
+    PaletteRam& getPaletteRam() { return mPaletteRam; }
+	const void getOamData() const; // TODO
 
     void setCPU(CPU6502* cpu) { mCPU = cpu; }
     void exec();
