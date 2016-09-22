@@ -1,11 +1,13 @@
 #pragma once
 #include "Cartridge.h"
+#include "PpuMem.h"
 #include "IMapper.h"
+#include "PPU.h"
 
 class NROM : public IMapper
 {
 public:
-    NROM(Cartridge* mCartridge);
+    NROM(Cartridge* mCartridge, PpuMem* vram, PPU* ppu);
     virtual ~NROM();
 
 public:
@@ -19,10 +21,13 @@ public:
     virtual uint8_t readPpu(uint16_t address);
 
 private:
-    bool mapCpuAddress(uint16_t address, uint8_t** ptr);
-    bool mapPpuAddress(uint16_t address, uint8_t** ptr);
+	// TODO: virtual
+    ICpuMemory* mapCpuAddress(uint16_t address, uint16_t& mappedAddress);
+	IPpuMemory* mapPpuAddress(uint16_t address, uint16_t& mappedAddress);
 
 private:
     Cartridge* mCartridge;
+	PpuMem* mVram;
+	PPU* mPPU;
 };
 

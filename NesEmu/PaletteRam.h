@@ -4,6 +4,7 @@
 #include <vector>
 #include <cassert>
 
+// TODO: inherit from vram?
 class PaletteRam : public IPpuMemory
 {
 public:
@@ -36,14 +37,12 @@ public:
 
 	virtual void writePpu(uint16_t address, uint8_t value)
 	{
-		uint16_t mappedAddress = (address - 0x3F00) % 0x20;
-		mValues[mappedAddress] = value;
+		mValues[address] = value;
 	}
 
 	virtual uint8_t readPpu(uint16_t address)
 	{
-		uint16_t mappedAddress = (address - 0x3F00) % 0x20;
-		return mValues[mappedAddress];
+		return mValues[address];
 	}
 
 public:

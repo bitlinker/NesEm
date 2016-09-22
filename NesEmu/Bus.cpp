@@ -5,11 +5,12 @@
 //static const uint16_t CONTROLLER_1_REGISTER_ADDR = 0x4016;
 //static const uint16_t CONTROLLER_2_REGISTER_ADDR = 0x4017;
 
-Bus::Bus(ICpuMemory* ram, IMapper* mapper, ICpuMemory* joypad1, ICpuMemory* joypad2, ICpuMemory* apu, ICpuMemory* ppu)
+Bus::Bus(ICpuMemory* ram, IMapper* mapper, ICpuMemory* joypad1, ICpuMemory* joypad2, ICpuMemory* apu, PPU* ppu)
     : mRam(ram)
     , mMapper(mapper)
     , mAPU(apu)
     , mPPU(ppu)
+	, mOamDma(this)
 {
     mJoyPad[0] = joypad1;
     mJoyPad[1] = joypad2;
@@ -18,6 +19,23 @@ Bus::Bus(ICpuMemory* ram, IMapper* mapper, ICpuMemory* joypad1, ICpuMemory* joyp
 
 Bus::~Bus()
 {
+}
+
+void Bus::OamDmaModule::writeCpu(uint16_t address, uint8_t value)
+{
+	for (uint8_t i = 0; i < 0xFF; ++i)
+	{
+		uint16_t cpuAddress = value << 8;
+		mBus->mPPU->writeOamByte(mBus->readCpu(cpuAddress++));
+	}
+	// TODO: OAMDMA cpu stall?
+	//mCPU->wait(0xFF);        
+}
+
+uint8_t Bus::OamDmaModule::readCpu(uint16_t address)
+{
+	assert(false || "Reading from OAMDMA!");
+	return 0;
 }
 
 ICpuMemory* Bus::mapCpuAddress(uint16_t address, bool bRead, uint16_t& mirroredAddress)
@@ -41,8 +59,7 @@ ICpuMemory* Bus::mapCpuAddress(uint16_t address, bool bRead, uint16_t& mirroredA
     }
     else if (address == 0x4014)
     {
-        // TODO: OAMDMA
-        assert(false || "OAMDMA not implemented");
+		pModule = &mOamDma;
     }
     else if (address < 0x4018)
     {
@@ -64,14 +81,27 @@ uint8_t Bus::readCpu(uint16_t address)
 {
     uint16_t mirroredAddress;
     ICpuMemory* pModule = mapCpuAddress(address, true, mirroredAddress);
-    assert(pModule);    
-    return pModule->readCpu(mirroredAddress);
+	if (pModule)
+	{
+		return pModule->readCpu(mirroredAddress);
+	}
+	else
+	{
+		assert(false || "Reading incorrect address");
+		return 0;
+	}    
 }
 
 void Bus::writeCpu(uint16_t address, uint8_t value)
 {
     uint16_t mirroredAddress;
     ICpuMemory* pModule = mapCpuAddress(address, false, mirroredAddress);
-    assert(pModule);
-    pModule->writeCpu(mirroredAddress, value);
+	if (pModule)
+	{
+		pModule->writeCpu(mirroredAddress, value);
+	}
+	else
+	{
+		assert(false || "Writing incorrect address");
+	}
 }

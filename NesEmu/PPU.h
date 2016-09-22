@@ -59,16 +59,16 @@ public:
 	PPU(const TvSystem& system);
 	virtual ~PPU();
 
+	// DI
+	void setCPU(CPU6502* cpu) { mCPU = cpu; }
+	void setMapper(IMapper* mapper) { mMapper = mapper; }
+
     virtual void writeCpu(uint16_t address, uint8_t value);
     virtual uint8_t readCpu(uint16_t address);
 
-    virtual void writePpu(uint16_t address, uint8_t value);
-    virtual uint8_t readPpu(uint16_t address);
-
     PaletteRam& getPaletteRam() { return mPaletteRam; }
-	const void getOamData() const; // TODO
+	void writeOamByte(uint8_t value);
 
-    void setCPU(CPU6502* cpu) { mCPU = cpu; }
     void exec();
 
     const std::vector<uint32_t>& getBuffer() const { return mBackBuffer; }
@@ -97,7 +97,7 @@ private:
     uint8_t mAddressLatch;
     uint16_t mAddress;
 
-    IPpuMemory* mPpuBus;
+    IMapper* mMapper;
 
     uint8_t mScanline;
     uint16_t mRowCycle;

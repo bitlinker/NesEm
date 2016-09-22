@@ -10,7 +10,7 @@
     <LocalDebuggerCommand>$(TargetPath)</LocalDebuggerCommand>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LocalDebuggerCommandArguments>d:\!github\NesEm\Tests\nestest\nestest.nes</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>"d:\!git_projects\NesEmu\Roms\Super Mario Bros. (Japan, USA).nes"</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerWorkingDirectory>$(ProjectDir)\Debug</LocalDebuggerWorkingDirectory>
   </PropertyGroup>

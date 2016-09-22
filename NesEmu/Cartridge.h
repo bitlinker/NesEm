@@ -1,6 +1,8 @@
 #pragma once
 #include <string>
 #include <vector>
+#include "CpuMem.h"
+#include "PpuMem.h"
 
 class Cartridge
 {
@@ -63,9 +65,9 @@ public:
 	Cartridge(const std::string& filename);
 	~Cartridge();
 
-    std::vector<uint8_t>& getPrgROM() { return mPrgROM; }
-    std::vector<uint8_t>& getPrgRAM() { return mPrgRAM; }
-    std::vector<uint8_t>& getChrROM() { return mChrROM; }
+    CpuMem& getPrgROM() { return mPrgROM; }
+	CpuMem& getPrgRAM() { return mPrgRAM; }
+	PpuMem& getChrROM() { return mChrROM; }
 
     uint32_t getMapper();
     bool isHorizontalMirroring();
@@ -73,9 +75,9 @@ public:
 
 private:
     std::vector<uint8_t> mTrainer;
-    std::vector<uint8_t> mPrgROM;
-    std::vector<uint8_t> mChrROM;
-    std::vector<uint8_t> mPrgRAM;
+    CpuMem mPrgROM;
+	PpuMem mChrROM;
+    CpuMem mPrgRAM;
     Header mHeader;
 };
 

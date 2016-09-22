@@ -46,7 +46,6 @@ static uint16_t PPUDATA_ADDRESS = 0x2007;
 static uint16_t OAMDMA_ADDRESS = 0x4014;
 
 PPU::PPU(const TvSystem& system)
-	//: //mVRAM(nullptr) // TODO
     : mTvSystem(system)
     , mNmiListener(nullptr)
     , mPalette(PALETTE_2C02)
@@ -82,9 +81,20 @@ uint8_t PPU::readCpu(uint16_t address)
     else if (address == PPUDATA_ADDRESS)
     {
         // TODO: check render / vblank behavior
-        //uint8_t value = mVRAM.read(mAddress);
+		uint8_t value = mMapper->readPpu(mAddress);
         incAddress();
+		return value;
     }
+	else if (address == PPUSCROLL_ADDRESS)
+	{
+		// TODO: why should it be red?
+		return 0;
+	}
+	else 
+	{
+		assert(false);
+	}
+	// TODO: assert?
     return 0;
 }
 
@@ -105,7 +115,7 @@ void PPU::writeCpu(uint16_t address, uint8_t value)
     else if (address == OAMDATA_ADDRESS)
     {
         // TODO: check render / vblank behavior
-        mOamData[mOamAddress++] = value;
+		writeOamByte(value);
     }
     else if (address == PPUSCROLL_ADDRESS)
     {
@@ -130,28 +140,19 @@ void PPU::writeCpu(uint16_t address, uint8_t value)
     else if (address == PPUDATA_ADDRESS)
     {
         // TODO: check render / vblank behavior
-        //mVRAM.write(mAddress, value);
+		mMapper->writePpu(mAddress, value);
         incAddress();
     }
     else if (address == OAMDMA_ADDRESS) // TODO: this is on CPU...
     {
-        for (uint8_t i = 0; i < 0xFF; ++i)
-            mOamData[mOamAddress++] = 0; // TODO: cpu ram here...
+		// Nothing to do. Data is already copied in bus class!
     }
+	else 
+	{
+		assert(false);
+		// TODO: assert
+	}
 }
-
-void PPU::writePpu(uint16_t address, uint8_t value)
-{
-    // TODO: mapper first, bus second
-    // TODO impl
-}
-
-uint8_t PPU::readPpu(uint16_t address)
-{
-    // TODO impl
-    return 0;
-}
-
 
 void PPU::incAddress()
 {
@@ -189,6 +190,11 @@ void PPU::exec()
     }
 }
 
+void PPU::writeOamByte(uint8_t value)
+{
+	mOamData[mOamAddress++] = value;
+}
+
 void PPU::drawStupid()
 {
     for (uint32_t y = 0; y < getHeight(); ++y)
@@ -208,9 +214,9 @@ void PPU::drawStupid()
                 uint16_t ntAddress = 0x2000 + mControl.nameTableAddress * 0x400;
                 // TODO: scrolling?
                 uint16_t ntCharAddress = ntAddress + ntY * 32 + ntX;
-                uint8_t ntChar = mPpuBus->readPpu(ntCharAddress);
+                uint8_t ntChar = mMapper->readPpu(ntCharAddress);
                 uint16_t ntAttrAddress = ntAddress + (32 * 30) + (ntY * 32 + ntX) / 4; // TODO: check
-                uint8_t ntAttr = mPpuBus->readPpu(ntAttrAddress);
+                uint8_t ntAttr = mMapper->readPpu(ntAttrAddress);
                 ntAttr &= 0x3; // TODO: offset for char
 
                 // Pattern table fetch:
@@ -221,8 +227,8 @@ void PPU::drawStupid()
                 uint8_t cX = x % 8;
                 uint8_t cY = y % 8;
 
-                uint8_t charLow = mPpuBus->readPpu(ptCharAddress + cY);
-                uint8_t charHigh = mPpuBus->readPpu(ptCharAddress + 8 + cY);
+                uint8_t charLow = mMapper->readPpu(ptCharAddress + cY);
+                uint8_t charHigh = mMapper->readPpu(ptCharAddress + 8 + cY);
                 
                 uint8_t pixelClr = ((charLow << cX) & 0x1) | (((charHigh << cX) & 0x1) << 0x1);
 

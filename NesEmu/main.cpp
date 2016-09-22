@@ -14,7 +14,7 @@
 #include "CPU6502.h"
 #include "Cartridge.h"
 #include "NROM.h"
-#include "RAM.h"
+#include "CpuMem.h"
 #include "APU.h"
 #include "PPU.h"
 #include "JoyPad.h"
@@ -36,9 +36,14 @@ int main(int argc, char **argv)
 	uint32_t mapper = testRom.getMapper();
 	assert(mapper == 0);
 
-	NROM nrom(&testRom);
-	RAM ram(0x800);
+	static const uint16_t RAM_SIZE = 0x800;
+
+	CpuMem ram(RAM_SIZE, true);
+	PpuMem vram(RAM_SIZE, true); // TODO: get size from cart?	
+	NROM nrom(&testRom, &vram, console.getPPU().get());	
     APU apu;
+
+	console.getPPU()->setMapper(&nrom); // TODO: rm
 
 	Bus bus(&ram, &nrom, console.getJoyPad(0).get(), console.getJoyPad(1).get(), &apu, console.getPPU().get());
 

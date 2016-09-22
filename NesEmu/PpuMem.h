@@ -2,14 +2,12 @@
 #include "IMemory.h"
 #include <vector>
 
-
 // TODO: ugly; RAM clone with different interface
-
-class VRAM : public IPpuMemory
+class PpuMem : public IPpuMemory
 {
 public:
-    VRAM(uint16_t capacity);
-    virtual ~VRAM();
+    PpuMem(uint16_t capacity, bool isWritable);
+    virtual ~PpuMem();
 
     uint8_t* getRawPtr() { return &mMemory[0]; }
 
@@ -18,5 +16,6 @@ public:
 
 private:
     std::vector<uint8_t> mMemory;
+	bool mIsWritable;
 };
 

@@ -24,9 +24,6 @@
     <ClCompile Include="JoyPad.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
-    <ClCompile Include="RAM.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
     <ClCompile Include="NROM.cpp">
       <Filter>Sources\Mappers</Filter>
     </ClCompile>
@@ -40,14 +37,14 @@
     <ClCompile Include="PPU.cpp">
       <Filter>Sources\PPU</Filter>
     </ClCompile>
-    <ClCompile Include="PpuBus.cpp">
-      <Filter>Sources\PPU</Filter>
-    </ClCompile>
     <ClCompile Include="Palette.cpp">
       <Filter>Sources\PPU</Filter>
     </ClCompile>
-    <ClCompile Include="VRAM.cpp">
-      <Filter>Sources\PPU</Filter>
+    <ClCompile Include="PpuMem.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="CpuMem.cpp">
+      <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -66,9 +63,6 @@
     <ClInclude Include="IMemory.h">
       <Filter>Sources</Filter>
     </ClInclude>
-    <ClInclude Include="RAM.h">
-      <Filter>Sources</Filter>
-    </ClInclude>
     <ClInclude Include="NROM.h">
       <Filter>Sources\Mappers</Filter>
     </ClInclude>
@@ -83,17 +77,17 @@
     <ClInclude Include="PPU.h">
       <Filter>Sources\PPU</Filter>
     </ClInclude>
-    <ClInclude Include="PpuBus.h">
-      <Filter>Sources\PPU</Filter>
-    </ClInclude>
     <ClInclude Include="Palette.h">
       <Filter>Sources\PPU</Filter>
     </ClInclude>
     <ClInclude Include="PaletteRam.h">
       <Filter>Sources\PPU</Filter>
     </ClInclude>
-    <ClInclude Include="VRAM.h">
-      <Filter>Sources\PPU</Filter>
+    <ClInclude Include="PpuMem.h">
+      <Filter>Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="CpuMem.h">
+      <Filter>Sources</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

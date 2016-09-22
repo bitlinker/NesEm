@@ -7,6 +7,9 @@
 static const char HEADER_MAGIC[] = { 'N', 'E', 'S', 0x1A };
 
 Cartridge::Cartridge(const std::string& filename)
+	: mChrROM(0, false) // TODO: ugly!
+	, mPrgROM(0, false)
+	, mPrgRAM(0, true)
 {
     FILE *f = nullptr;
     fopen_s(&f, filename.c_str(), "rb");
@@ -26,18 +29,18 @@ Cartridge::Cartridge(const std::string& filename)
         prgRamSize = 8 * 1024; // 8Kb for compatibility
     }
 
-    mPrgRAM.resize(prgRamSize);
+    mPrgRAM = CpuMem(prgRamSize, true);
 
-    mPrgROM.resize(prgRomSize);
+    mPrgROM = CpuMem(prgRomSize, false);
     if (prgRomSize > 0)
     {
-        fread(&mPrgROM[0], prgRomSize, 1, f);
+        fread(mPrgROM.getRawPtr(), prgRomSize, 1, f);
     }
 
-	mChrROM.resize(chrRomSize);
+	mChrROM = PpuMem(chrRomSize, false);
     if (chrRomSize > 0)
     {
-        fread(&mChrROM[0], chrRomSize, 1, f);
+        fread(mChrROM.getRawPtr(), chrRomSize, 1, f);
     }
 
 	fclose(f);
